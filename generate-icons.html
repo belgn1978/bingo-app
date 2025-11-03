@@ -1,0 +1,110 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Icon Generator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        text-align: center;
+      }
+      canvas {
+        border: 2px solid #ddd;
+        margin: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin: 10px;
+        cursor: pointer;
+        background: #4facfe;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #3a8cd9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Bingo App Icon Generator</h1>
+    <p>Click the buttons below to download the app icons</p>
+
+    <canvas id="canvas192" width="192" height="192"></canvas>
+    <canvas id="canvas512" width="512" height="512"></canvas>
+
+    <div>
+      <button onclick="downloadIcon(192)">Download 192x192 Icon</button>
+      <button onclick="downloadIcon(512)">Download 512x512 Icon</button>
+    </div>
+
+    <script>
+      function createIcon(size) {
+        const canvas = document.getElementById(`canvas${size}`);
+        const ctx = canvas.getContext("2d");
+
+        // Gradient background
+        const gradient = ctx.createLinearGradient(0, 0, size, 0);
+        gradient.addColorStop(0, "#ff69b4");
+        gradient.addColorStop(0.25, "#da70d6");
+        gradient.addColorStop(0.5, "#ba55d3");
+        gradient.addColorStop(0.75, "#9932cc");
+        gradient.addColorStop(1, "#8b008b");
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+
+        // White text "BINGO"
+        ctx.fillStyle = "white";
+        ctx.font = `bold ${size * 0.15}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("BINGO", size / 2, size / 2);
+
+        // Add decorative elements (circles in corners)
+        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+        const circleSize = size * 0.15;
+        ctx.beginPath();
+        ctx.arc(circleSize, circleSize, circleSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(size - circleSize, circleSize, circleSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(circleSize, size - circleSize, circleSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(
+          size - circleSize,
+          size - circleSize,
+          circleSize,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      }
+
+      function downloadIcon(size) {
+        const canvas = document.getElementById(`canvas${size}`);
+        const link = document.createElement("a");
+        link.download = `icon-${size}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+      }
+
+      // Generate icons on load
+      createIcon(192);
+      createIcon(512);
+    </script>
+  </body>
+</html>

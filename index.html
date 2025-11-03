@@ -1,0 +1,963 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+   
+  <head>
+       
+    <meta charset="UTF-8" />
+       
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+       
+    <title>Jo's Bingo Tickets</title>
+
+           
+    <meta
+      name="description"
+      content="Generate and print custom bingo tickets with various themes"
+    />
+       
+    <meta name="theme-color" content="#ff69b4" />
+       
+    <link rel="manifest" href="manifest.json" />
+       
+    <link rel="apple-touch-icon" href="icon-192.png" />
+
+       
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+       
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+       
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"
+      rel="stylesheet"
+    />
+       
+    <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+
+            body {
+              font-family: "Lato", sans-serif;
+              background: #f5f5f5;
+              padding: 1rem;
+            }
+
+            header {
+              text-align: center;
+              margin-bottom: 1.5rem;
+            }
+
+            header h1 {
+              font-size: clamp(1.5rem, 5vw, 2rem);
+              color: #333;
+              margin-bottom: 1rem;
+            }
+
+            .controls-container {
+              max-width: 800px;
+              margin: 0 auto 1.5rem;
+              padding: 1.5rem;
+              background: white;
+              border-radius: 8px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .control-section {
+              margin-bottom: 1.5rem;
+            }
+
+            .control-section:last-child {
+              margin-bottom: 0;
+            }
+
+            .control-label {
+              font-size: 1rem;
+              font-weight: 600;
+              color: #333;
+              margin-bottom: 0.75rem;
+              display: block;
+            }
+
+            .color-options {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.75rem;
+              justify-content: center;
+            }
+
+            .color-btn {
+              width: 50px;
+              height: 50px;
+              border: 3px solid transparent;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .color-btn:hover {
+              transform: scale(1.1);
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            .color-btn.active {
+              border-color: #333;
+              transform: scale(1.15);
+            }
+
+            .checkbox-container {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 0.5rem;
+            }
+
+            .checkbox-container input[type="checkbox"] {
+              width: 20px;
+              height: 20px;
+              cursor: pointer;
+            }
+
+            .checkbox-container label {
+              font-size: 1rem;
+              cursor: pointer;
+            }
+
+            .page-control {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 1rem;
+              flex-wrap: wrap;
+            }
+
+            .page-control input[type="number"] {
+              width: 80px;
+              padding: 0.5rem;
+              font-size: 1rem;
+              border: 2px solid #ddd;
+              border-radius: 4px;
+              text-align: center;
+            }
+
+            .btn {
+              padding: 0.75rem 1.5rem;
+              font-size: 1rem;
+              font-weight: 600;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            }
+
+            .btn-primary {
+              background: #4facfe;
+              color: white;
+            }
+
+            .btn-primary:hover {
+              background: #3a8cd9;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-success {
+              background: #48c774;
+              color: white;
+            }
+
+            .btn-success:hover {
+              background: #3aa760;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn:active {
+              transform: translateY(0);
+            }
+
+            .info-text {
+              text-align: center;
+              color: #666;
+              font-size: 0.9rem;
+              margin-top: 0.5rem;
+            }
+
+            .free-space-options {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.5rem;
+              justify-content: center;
+            }
+
+            .free-space-btn {
+              padding: 0.5rem 1rem;
+              border: 2px solid #ddd;
+              background: white;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 0.9rem;
+              transition: all 0.3s ease;
+            }
+
+            .free-space-btn:hover {
+              border-color: #999;
+              transform: translateY(-2px);
+            }
+
+            .free-space-btn.active {
+              border-color: #4facfe;
+              background: #e3f2fd;
+              font-weight: 600;
+            }
+
+            .custom-text-input {
+              width: 100%;
+              max-width: 300px;
+              padding: 0.5rem;
+              font-size: 1rem;
+              border: 2px solid #ddd;
+              border-radius: 4px;
+              text-align: center;
+            }
+
+            .custom-text-input:focus {
+              outline: none;
+              border-color: #4facfe;
+            }
+
+            .container {
+              display: grid;
+              grid-template-columns: 1fr;
+              gap: 1.5rem;
+              max-width: 1200px;
+              margin: 0 auto;
+            }
+
+            .page {
+              page-break-after: always;
+            }
+
+            .bingo-card {
+              display: grid;
+              grid-template-columns: repeat(5, 1fr);
+              gap: 2px;
+              width: 100%;
+              max-width: 400px;
+              margin: 0 auto;
+              background: white;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              border: 2px solid black;
+            }
+
+            .cell {
+              position: relative;
+              padding: 0;
+              background: white;
+              min-height: 50px;
+              overflow: hidden;
+              box-sizing: border-box;
+            }
+
+            .cell-content-wrapper {
+              position: relative;
+              width: 100%;
+              padding-top: 100%;
+              height: 0;
+            }
+
+            .cell-content {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              line-height: 1.2;
+              padding: 0.5rem;
+            }
+
+            .cell-number .cell-content {
+              font-size: clamp(1rem, 3vw, 1.25rem);
+              font-weight: 500;
+              color: #333;
+            }
+
+            .cell-header {
+              color: white;
+              font-weight: 700;
+              font-size: clamp(1.25rem, 4vw, 1.75rem);
+            }
+
+            .cell-free-space {
+              color: white;
+              font-weight: 700;
+            }
+
+            .cell-free-space .cell-content {
+              padding: 0.25rem;
+            }
+
+            .cell-free-space .text-style {
+              font-size: clamp(1rem, 3vw, 1.25rem);
+              line-height: 1.2;
+            }
+
+            .cell-free-space .shape-style {
+              font-size: clamp(2.5rem, 6vw, 3rem);
+              line-height: 1;
+            }
+
+            @media (min-width: 640px) {
+              .container {
+                grid-template-columns: repeat(2, 1fr);
+              }
+            }
+
+            @media (min-width: 1024px) {
+              .container {
+                grid-template-columns: repeat(3, 1fr);
+              }
+
+              body {
+                padding: 2rem;
+              }
+            }
+
+            @media print {
+              body {
+                background: white;
+                padding: 0;
+                margin: 0;
+              }
+
+              header,
+              .controls-container {
+                display: none;
+              }
+
+              .page {
+                width: 210mm;
+                height: 297mm;
+                page-break-after: always;
+                padding: 5mm;
+                margin: 0;
+              }
+
+              .page:last-child {
+                page-break-after: auto;
+              }
+
+              .container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4mm;
+                height: 100%;
+                max-width: none;
+                margin: 0 auto;
+              }
+
+              .bingo-card {
+                box-shadow: none;
+                border-radius: 0;
+                border: none;
+                gap: 2px;
+                margin: 0;
+                width: 100%;
+              }
+
+              .cell {
+                position: relative;
+                box-sizing: border-box;
+                border: 1px solid #333;
+                background: white;
+              }
+
+              .cell-header {
+                border: 1px solid #333;
+              }
+
+              .cell-header .cell-content-wrapper {
+                padding-top: 100%;
+                height: 0;
+              }
+
+              .cell-free-space {
+                /* The background property is applied by JS, but we must override the
+                   @media print rule that sets it to white if it's currently present. */
+                /* background: white !important; <-- REMOVED, not needed due to fix below */
+              }
+
+              .cell-content-wrapper {
+                padding-top: 100%;
+                height: 0;
+              }
+
+              .cell-number .cell-content {
+                font-size: 14pt;
+                font-weight: 800;
+                color: black;
+                padding: 0;
+              }
+
+              .cell-header .cell-content {
+                font-size: 14pt;
+                font-weight: 900;
+                color: white;
+                background: inherit;
+                padding: 0;
+              }
+
+              .cell-free-space .cell-content.text-style {
+                font-size: 12pt;
+                font-weight: 900;
+                color: black;
+              }
+
+              .cell-free-space .cell-content.shape-style {
+                font-size: 18pt;
+              }
+
+              /* ========================================================== */
+              /* ✨ CRITICAL PRINT COLOR FIX: Applies to the colored elements */
+              /* ========================================================== */
+              .cell-header,
+              .cell-free-space {
+                  /* Force the browser to print the background color/gradient */
+                  -webkit-print-color-adjust: exact !important;
+                  color-adjust: exact !important;
+              }
+            }
+         
+    </style>
+     
+  </head>
+   
+  <body>
+       
+    <header>
+           
+      <h1>Jo's Bingo Tickets</h1>
+         
+    </header>
+
+       
+    <div class="controls-container">
+           
+      <div class="control-section">
+               
+        <div class="control-label">Choose Color Theme:</div>
+               
+        <div class="color-options">
+                   
+          <button
+            class="color-btn active"
+            data-gradient="pink"
+            style="
+              background: linear-gradient(
+                90deg,
+                #ff69b4 0%,
+                #da70d6 25%,
+                #ba55d3 50%,
+                #9932cc 75%,
+                #8b008b 100%
+              );
+            "
+          ></button>
+                   
+          <button
+            class="color-btn"
+            data-gradient="blue"
+            style="background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)"
+          ></button>
+                   
+          <button
+            class="color-btn"
+            data-gradient="purple"
+            style="background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)"
+          ></button>
+                   
+          <button
+            class="color-btn"
+            data-gradient="orange"
+            style="background: linear-gradient(90deg, #fa709a 0%, #fee140 100%)"
+          ></button>
+                   
+          <button
+            class="color-btn"
+            data-gradient="green"
+            style="background: linear-gradient(90deg, #30cfd0 0%, #330867 100%)"
+          ></button>
+                   
+          <button
+            class="color-btn"
+            data-gradient="sunset"
+            style="
+              background: linear-gradient(
+                90deg,
+                #ff6b6b 0%,
+                #feca57 50%,
+                #ee5a6f 100%
+              );
+            "
+          ></button>
+                   
+          <button
+            class="color-btn"
+            data-gradient="ocean"
+            style="background: linear-gradient(90deg, #2e3192 0%, #1bffff 100%)"
+          ></button>
+                   
+          <button
+            class="color-btn"
+            data-gradient="fire"
+            style="background: linear-gradient(90deg, #f12711 0%, #f5af19 100%)"
+          ></button>
+                 
+        </div>
+             
+      </div>
+
+           
+      <div class="control-section">
+               
+        <div class="checkbox-container">
+                    <input type="checkbox" id="allowRepeats" />          
+          <label for="allowRepeats"
+            >Allow number repeats in groups of 3 cards</label
+          >
+                 
+        </div>
+               
+        <div class="info-text">
+                    Tip: Generate cards before printing. Print works best in
+          Chrome/Edge.        
+        </div>
+             
+      </div>
+
+           
+      <div class="control-section">
+               
+        <div class="control-label">Free Space Style:</div>
+               
+        <div class="free-space-options">
+                   
+          <button class="free-space-btn active" data-style="text">Text</button>
+                   
+          <button class="free-space-btn" data-style="custom">
+                        Custom Text          
+          </button>
+                   
+          <button class="free-space-btn" data-style="star">⭐ Star</button>    
+               
+          <button class="free-space-btn" data-style="heart">❤️ Heart</button>  
+                 
+          <button class="free-space-btn" data-style="tree">
+                        🎄 Christmas Tree          
+          </button>
+                   
+          <button class="free-space-btn" data-style="snowflake">
+                        ❄️ Snowflake          
+          </button>
+                   
+          <button class="free-space-btn" data-style="pumpkin">
+                        🎃 Pumpkin          
+          </button>
+                   
+          <button class="free-space-btn" data-style="gift">🎁 Gift</button>    
+               
+          <button class="free-space-btn" data-style="owl">🦉 Owl</button>      
+           
+        </div>
+               
+        <div
+          id="customTextContainer"
+          style="display: none; margin-top: 0.75rem; text-align: center"
+        >
+                   
+          <input
+            type="text"
+            id="customTextInput"
+            class="custom-text-input"
+            placeholder="Enter custom text..."
+            maxlength="20"
+            value="Free Space"
+          />
+                 
+        </div>
+             
+      </div>
+
+           
+      <div class="control-section">
+               
+        <div class="control-label">Number of Pages (9 cards per page):</div>
+               
+        <div class="page-control">
+                   
+          <input type="number" id="pageCount" value="1" min="1" max="50" />    
+               
+          <button class="btn btn-primary" onclick="generateCards()">
+                        Generate Cards          
+          </button>
+                   
+          <button class="btn btn-success" onclick="printCards()">
+                        Print Cards          
+          </button>
+                 
+        </div>
+             
+      </div>
+         
+    </div>
+
+       
+    <div id="pages-container"></div>
+
+       
+    <script>
+      const gradients = {
+        pink: "linear-gradient(90deg, #ff69b4 0%, #da70d6 25%, #ba55d3 50%, #9932cc 75%, #8b008b 100%)",
+        blue: "linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)",
+        purple: "linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)",
+        orange: "linear-gradient(90deg, #fa709a 0%, #fee140 100%)",
+        green: "linear-gradient(90deg, #30cfd0 0%, #330867 100%)",
+        sunset: "linear-gradient(90deg, #ff6b6b 0%, #feca57 50%, #ee5a6f 100%)",
+        ocean: "linear-gradient(90deg, #2e3192 0%, #1bffff 100%)",
+        fire: "linear-gradient(90deg, #f12711 0%, #f5af19 100%)",
+      };
+
+      let currentGradient = gradients.pink;
+      let currentGradientName = "pink";
+      let freeSpaceStyle = "text";
+      let customText = "Free Space";
+
+      const shapes = {
+        star: "⭐",
+        heart: "❤️",
+        tree: "🎄",
+        snowflake: "❄️",
+        pumpkin: "🎃",
+        gift: "🎁",
+        owl: "🦉",
+      };
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function createCell(content = "", classes = "") {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("cell-content");
+        wrapper.innerHTML = content;
+
+        const cellWrapper = document.createElement("div");
+        cellWrapper.classList.add("cell-content-wrapper");
+        cellWrapper.appendChild(wrapper);
+
+        const cell = document.createElement("div");
+        cell.classList.add("cell", ...classes.split(" ").filter((c) => c));
+        cell.appendChild(cellWrapper);
+        return cell;
+      }
+
+      function createBingoCard() {
+        const card = document.createElement("div");
+        card.classList.add("bingo-card");
+
+        const headerLetters = ["B", "I", "N", "G", "O"]; // Header row
+
+        headerLetters.forEach((letter) => {
+          const headerCell = createCell(letter, "cell-header");
+          headerCell.style.background = currentGradient;
+          card.appendChild(headerCell);
+        }); // Number cells (5 rows x 5 columns)
+
+        for (let row = 0; row < 5; row++) {
+          for (let col = 0; col < 5; col++) {
+            if (row === 2 && col === 2) {
+              // Free space
+              const freeSpaceCell = createCell("", "cell-free-space");
+              freeSpaceCell.setAttribute("data-col", col);
+              freeSpaceCell.setAttribute("data-row", row);
+              updateFreeSpace(freeSpaceCell);
+              card.appendChild(freeSpaceCell);
+            } else {
+              // Number cell
+              const numberCell = createCell("", "cell-number");
+              numberCell.setAttribute("data-col", col);
+              numberCell.setAttribute("data-row", row);
+              card.appendChild(numberCell);
+            }
+          }
+        }
+
+        return card;
+      }
+
+      function updateFreeSpace(cell) {
+        const contentText =
+          freeSpaceStyle === "text" || freeSpaceStyle === "custom"
+            ? freeSpaceStyle === "custom"
+              ? customText
+              : "Free Space"
+            : shapes[freeSpaceStyle];
+
+        const contentDiv = cell.querySelector(".cell-content");
+        contentDiv.textContent = contentText;
+
+        contentDiv.className = "cell-content";
+
+        if (freeSpaceStyle === "text" || freeSpaceStyle === "custom") {
+          contentDiv.classList.add("text-style");
+        } else {
+          contentDiv.classList.add("shape-style");
+        }
+
+        cell.style.background = currentGradient;
+      }
+
+      function getCardHash(card) {
+        const numbers = [];
+        card.querySelectorAll(".cell-number").forEach((cell) => {
+          const text = cell.querySelector(".cell-content").textContent.trim();
+          if (text && !isNaN(text)) {
+            numbers.push(parseInt(text));
+          }
+        });
+        numbers.sort((a, b) => a - b);
+        return numbers.join("-");
+      }
+
+      function generateCards() {
+        const pageCount = parseInt(document.getElementById("pageCount").value);
+        const allowRepeats = document.getElementById("allowRepeats").checked;
+        const pagesContainer = document.getElementById("pages-container");
+
+        pagesContainer.innerHTML = "";
+
+        const allGeneratedHashes = new Set();
+
+        for (let p = 0; p < pageCount; p++) {
+          const page = document.createElement("div");
+          page.className = "page";
+
+          const container = document.createElement("div");
+          container.className = "container";
+
+          const cards = [];
+          for (let i = 0; i < 9; i++) {
+            const card = createBingoCard();
+            container.appendChild(card);
+            cards.push(card);
+          }
+
+          page.appendChild(container);
+          pagesContainer.appendChild(page); // Generate numbers for each BINGO column
+
+          for (let bingoCol = 0; bingoCol < 5; bingoCol++) {
+            const min = bingoCol * 15 + 1;
+            const max = (bingoCol + 1) * 15;
+
+            if (!allowRepeats) {
+              // Group cards VERTICALLY: 0,3,6 then 1,4,7 then 2,5,8
+              for (let verticalGroup = 0; verticalGroup < 3; verticalGroup++) {
+                const allNumbers = Array.from(
+                  { length: max - min + 1 },
+                  (_, i) => min + i
+                );
+                shuffleArray(allNumbers);
+
+                const cardIndices = [
+                  verticalGroup,
+                  verticalGroup + 3,
+                  verticalGroup + 6,
+                ];
+                let numIndex = 0;
+
+                cardIndices.forEach((cardIdx) => {
+                  const card = cards[cardIdx];
+                  const cellsInColumn = Array.from(
+                    card.querySelectorAll(".cell-number, .cell-free-space")
+                  ).filter(
+                    (cell) =>
+                      parseInt(cell.getAttribute("data-col")) === bingoCol
+                  );
+
+                  cellsInColumn.forEach((cell) => {
+                    if (!cell.classList.contains("cell-free-space")) {
+                      cell.querySelector(".cell-content").textContent =
+                        allNumbers[numIndex];
+                      numIndex++;
+                    }
+                  });
+                });
+              }
+            } else {
+              // Each card gets its own random numbers
+              cards.forEach((card) => {
+                const allNumbers = Array.from(
+                  { length: max - min + 1 },
+                  (_, i) => min + i
+                );
+                shuffleArray(allNumbers);
+
+                const cellsInColumn = Array.from(
+                  card.querySelectorAll(".cell-number, .cell-free-space")
+                ).filter(
+                  (cell) => parseInt(cell.getAttribute("data-col")) === bingoCol
+                );
+
+                let numIndex = 0;
+                cellsInColumn.forEach((cell) => {
+                  if (!cell.classList.contains("cell-free-space")) {
+                    cell.querySelector(".cell-content").textContent =
+                      allNumbers[numIndex];
+                    numIndex++;
+                  }
+                });
+              });
+            }
+          } // Check for duplicate cards across all pages
+
+          cards.forEach((card) => {
+            const cardHash = getCardHash(card);
+            let attempts = 0;
+
+            while (allGeneratedHashes.has(cardHash) && attempts < 100) {
+              attempts++; // Regenerate this card
+
+              for (let bingoCol = 0; bingoCol < 5; bingoCol++) {
+                const min = bingoCol * 15 + 1;
+                const max = (bingoCol + 1) * 15;
+                const allNumbers = Array.from(
+                  { length: max - min + 1 },
+                  (_, i) => min + i
+                );
+                shuffleArray(allNumbers);
+
+                const cellsInColumn = Array.from(
+                  card.querySelectorAll(".cell-number, .cell-free-space")
+                ).filter(
+                  (cell) => parseInt(cell.getAttribute("data-col")) === bingoCol
+                );
+
+                let numIndex = 0;
+                cellsInColumn.forEach((cell) => {
+                  if (!cell.classList.contains("cell-free-space")) {
+                    cell.querySelector(".cell-content").textContent =
+                      allNumbers[numIndex];
+                    numIndex++;
+                  }
+                });
+              }
+
+              const newHash = getCardHash(card);
+              if (!allGeneratedHashes.has(newHash)) {
+                allGeneratedHashes.add(newHash);
+                break;
+              }
+            }
+
+            if (!allGeneratedHashes.has(cardHash)) {
+              allGeneratedHashes.add(cardHash);
+            }
+          });
+        }
+
+        applyGradient();
+      }
+
+      function applyGradient() {
+        document.querySelectorAll(".cell-header").forEach((header) => {
+          header.style.background = currentGradient;
+        });
+        document.querySelectorAll(".cell-free-space").forEach((space) => {
+          space.style.background = currentGradient;
+        });
+      }
+
+      function printCards() {
+        const pagesContainer = document.getElementById("pages-container");
+        if (pagesContainer.children.length === 0) {
+          alert("Please generate cards first before printing!");
+          return;
+        }
+        window.print();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Color picker
+        const colorBtns = document.querySelectorAll(".color-btn");
+        colorBtns.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            colorBtns.forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            currentGradientName = btn.dataset.gradient;
+            currentGradient = gradients[currentGradientName];
+            applyGradient();
+          });
+        }); // Free space style picker
+
+        const freeSpaceBtns = document.querySelectorAll(".free-space-btn");
+        const customTextContainer = document.getElementById(
+          "customTextContainer"
+        );
+        const customTextInput = document.getElementById("customTextInput");
+
+        freeSpaceBtns.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            freeSpaceBtns.forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            freeSpaceStyle = btn.dataset.style;
+
+            customTextContainer.style.display =
+              freeSpaceStyle === "custom" ? "block" : "none";
+
+            document.querySelectorAll(".cell-free-space").forEach((cell) => {
+              updateFreeSpace(cell);
+            });
+          });
+        }); // Custom text input
+
+        customTextInput.addEventListener("input", (e) => {
+          customText = e.target.value || "Free Space";
+          if (freeSpaceStyle === "custom") {
+            document.querySelectorAll(".cell-free-space").forEach((cell) => {
+              updateFreeSpace(cell);
+            });
+          }
+        }); // Generate initial page
+
+        generateCards(); // Register Service Worker for PWA
+
+        if ("serviceWorker" in navigator) {
+          window.addEventListener("load", () => {
+            navigator.serviceWorker
+              .register("service-worker.js")
+              .then((registration) => console.log("Service Worker registered"))
+              .catch((err) =>
+                console.log("Service Worker registration failed:", err)
+              );
+          });
+        }
+      });
+    </script>
+     
+  </body>
+</html>

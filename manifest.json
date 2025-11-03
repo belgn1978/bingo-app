@@ -1,0 +1,25 @@
+{
+  "name": "Jo's Bingo Tickets",
+  "short_name": "Bingo",
+  "description": "Generate and print custom bingo tickets",
+  "start_url": "/bingo-app/",
+  "scope": "/bingo-app/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff69b4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
