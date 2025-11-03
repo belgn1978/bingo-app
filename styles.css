@@ -1,0 +1,403 @@
+/**
+ * style.css
+ *
+ * @format
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+  background: #f5f5f5;
+  padding: 1rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+header h1 {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.controls-container {
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.control-section {
+  margin-bottom: 1.5rem;
+}
+
+.control-section:last-child {
+  margin-bottom: 0;
+}
+
+.control-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.color-btn {
+  width: 50px;
+  height: 50px;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.color-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.color-btn.active {
+  border-color: #333;
+  transform: scale(1.15);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.checkbox-container label {
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.page-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-control input[type="number"] {
+  width: 80px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #4facfe;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #3a8cd9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+  background: #48c774;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #3aa760;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.info-text {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.free-space-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.free-space-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.free-space-btn:hover {
+  border-color: #999;
+  transform: translateY(-2px);
+}
+
+.free-space-btn.active {
+  border-color: #4facfe;
+  background: #e3f2fd;
+  font-weight: 600;
+}
+
+.custom-text-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.custom-text-input:focus {
+  outline: none;
+  border-color: #4facfe;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page {
+  page-break-after: always;
+}
+
+.bingo-card {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid black;
+}
+
+.cell {
+  position: relative;
+  padding: 0;
+  background: white;
+  min-height: 50px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.cell-content-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  height: 0;
+}
+
+.cell-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+  padding: 0.5rem;
+}
+
+.cell-number .cell-content {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 500;
+  color: #333;
+}
+
+.cell-header {
+  color: white;
+  font-weight: 700;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+}
+
+.cell-free-space {
+  color: white;
+  font-weight: 700;
+}
+
+.cell-free-space .cell-content {
+  padding: 0.25rem;
+}
+
+.cell-free-space .text-style {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  line-height: 1.2;
+}
+
+.cell-free-space .shape-style {
+  font-size: clamp(2.5rem, 6vw, 3rem);
+  line-height: 1;
+}
+
+@media (min-width: 640px) {
+  .container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  body {
+    padding: 2rem;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+    padding: 0;
+    margin: 0;
+  }
+
+  header,
+  .controls-container {
+    display: none;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    page-break-after: always;
+    padding: 5mm;
+    margin: 0;
+  }
+
+  .page:last-child {
+    page-break-after: auto;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4mm;
+    height: 100%;
+    max-width: none;
+    margin: 0 auto;
+  }
+
+  .bingo-card {
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    gap: 2px;
+    margin: 0;
+    width: 100%;
+  }
+
+  .cell {
+    position: relative;
+    box-sizing: border-box;
+    border: 1px solid #333;
+    background: white;
+  }
+
+  .cell-header {
+    border: 1px solid #333;
+  }
+
+  .cell-header .cell-content-wrapper {
+    padding-top: 100%;
+    height: 0;
+  }
+
+  .cell-content-wrapper {
+    padding-top: 100%;
+    height: 0;
+  }
+
+  .cell-number .cell-content {
+    font-size: 14pt;
+    font-weight: 800;
+    color: black;
+    padding: 0;
+  }
+
+  .cell-header .cell-content {
+    font-size: 14pt;
+    font-weight: 900;
+    color: white;
+    background: inherit;
+    padding: 0;
+  }
+
+  .cell-free-space .cell-content.text-style {
+    font-size: 12pt;
+    font-weight: 900;
+    color: black;
+  }
+
+  .cell-free-space .cell-content.shape-style {
+    font-size: 18pt;
+  }
+
+  /* ========================================================== */
+  /* ✨ CRITICAL PRINT COLOR FIX: Applies to the colored elements */
+  /* ========================================================== */
+  .cell-header,
+  .cell-free-space {
+    /* Force the browser to print the background color/gradient */
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}

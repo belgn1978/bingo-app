@@ -1,77 +1,60 @@
 /** @format */
 
-const CACHE_NAME = "bingo-tickets-v1";
-// Increment the version number whenever you change the files listed here.
-// The new fetch handler will handle daily updates.
-const urlsToCache = [
-  // IMPORTANT: Use the repository subpath for the root and all files
-  "/bingo-app/",
-  "/bingo-app/index.html",
-  "/bingo-app/manifest.json",
-  "/bingo-app/icon-192.png",
-  "/bingo-app/icon-512.png",
-  // Include any other static assets (CSS, custom fonts, etc.)
-  "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap",
+// service-worker.js
+
+// 1. Update the cache version number to v2
+const CACHE_NAME = "bingo-generator-cache-v2";
+
+// 2. Updated list of all critical files to pre-cache
+const FILES_TO_CACHE = [
+  "/", // The root path (important for offline loading)
+  "./index.html",
+  "./style.css", // <-- NEW: Separate CSS file
+  "./script.js", // <-- NEW: Separate JS file
+  "./manifest.json",
+  "./icon-192.png",
+  // Add any other icons, fonts, or assets here
 ];
 
-// 1. Installation: Cache the initial files
+// Event: install (pre-cache resources)
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(urlsToCache);
-      })
-      // Force the new service worker to immediately become active
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log("Service Worker: Caching App Shell");
+      return cache.addAll(FILES_TO_CACHE);
+    })
   );
+  // Forces the waiting service worker to become the active service worker
+  self.skipWaiting();
 });
 
-// 2. Activation: Clean up old caches
+// Event: activate (clean up old caches)
 self.addEventListener("activate", (event) => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
+            console.log("Service Worker: Deleting old cache", cacheName);
             return caches.delete(cacheName);
           }
         })
-      ).then(() => self.clients.claim());
+      );
     })
   );
+  // Immediately claims all clients (pages) so they start using the new worker
+  self.clients.claim();
 });
 
-// 3. Fetch: Stale-While-Revalidate for Auto-Updates
-// This ensures the app loads fast (stale content) but checks the network
-// in the background to update the cache (revalidate).
+// Event: fetch (serve files from cache or network)
 self.addEventListener("fetch", (event) => {
-  // Only process GET requests (for static assets)
-  if (event.request.method !== "GET") {
-    return;
+  // We only intercept requests that don't start with a special protocol
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        // Return file from cache if found, otherwise fetch from network
+        return response || fetch(event.request);
+      })
+    );
   }
-
-  event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      // Check the cache first for the resource.
-      return cache.match(event.request).then((cachedResponse) => {
-        // Fetch the resource from the network.
-        const fetchedResponse = fetch(event.request)
-          .then((networkResponse) => {
-            // Cache the new response for future use.
-            if (networkResponse.ok) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => {
-            // If both cache and network fail, fall back to cached response (if available)
-          });
-
-        // Return cached version immediately if available, otherwise wait for network.
-        return cachedResponse || fetchedResponse;
-      });
-    })
-  );
 });
