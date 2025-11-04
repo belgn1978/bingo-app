@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Redirecting to Application...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <script>
+        // *** Start of GitHub Pages SPA Redirect Script ***
+        
+        // 1. Get the repository name (e.g., 'bingo-app') from the URL
+        function getRepoName() {
+            // Split the path (e.g., /bingo-app/internal-page) by '/'
+            const pathParts = window.location.pathname.split('/');
+            // The repository name is always the second element (index 1) in a Project Page URL
+            return pathParts[1]; 
+        }
+
+        const repoName = getRepoName();
+
+        // 2. Define the correct base path for the index.html file
+        // e.g., /bingo-app/
+        const baseUrl = "/" + repoName + "/";
+
+        // 3. Construct the new URL to force the app to load
+        // We preserve query parameters (like ?q=search) and hash (#sections)
+        const correctedUrl = baseUrl + window.location.search + window.location.hash;
+        
+        // 4. Perform the redirect
+        // We use replace() to avoid cluttering the browser history with the 404 URL
+        window.location.replace(correctedUrl);
+
+        // *** End of GitHub Pages SPA Redirect Script ***
+    </script>
+</head>
+<body>
+    <p>Loading application...</p>
+</body>
+</html>
