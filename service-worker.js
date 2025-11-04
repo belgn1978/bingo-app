@@ -1,6 +1,6 @@
 // service-worker.js
 // Update the cache version number whenever you make changes
-const CACHE_NAME = "bingo-generator-cache-v4";
+const CACHE_NAME = "bingo-generator-cache-v5";
 
 // IMPORTANT: Files are in root directory
 // If your repo is at https://username.github.io/ (root)
