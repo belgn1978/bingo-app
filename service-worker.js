@@ -1,27 +1,38 @@
-/** @format */
-
 // service-worker.js
+// Update the cache version number whenever you make changes
+const CACHE_NAME = "bingo-generator-cache-v4";
 
-// 1. Update the cache version number to v2
-const CACHE_NAME = "bingo-generator-cache-v2";
+// IMPORTANT: Files are in root directory
+// If your repo is at https://username.github.io/ (root)
+// then BASE_PATH should be empty string
+const BASE_PATH = "";
 
-// 2. Updated list of all critical files to pre-cache
+// List of all critical files to pre-cache
 const FILES_TO_CACHE = [
-  "/", // The root path (important for offline loading)
-  "./index.html",
-  "./style.css", // <-- NEW: Separate CSS file
-  "./script.js", // <-- NEW: Separate JS file
-  "./manifest.json",
-  "./icon-192.png",
-  // Add any other icons, fonts, or assets here
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/style.css`,
+  `${BASE_PATH}/script.js`,
+  `${BASE_PATH}/manifest.json`,
+  `${BASE_PATH}/icon-192.png`,
+  `${BASE_PATH}/icon-512.png`,
 ];
 
 // Event: install (pre-cache resources)
 self.addEventListener("install", (event) => {
+  console.log("Service Worker: Installing...");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log("Service Worker: Caching App Shell");
-      return cache.addAll(FILES_TO_CACHE);
+      return cache.addAll(FILES_TO_CACHE).catch((err) => {
+        console.error("Service Worker: Cache addAll failed:", err);
+        // Log which files failed
+        FILES_TO_CACHE.forEach((file) => {
+          fetch(file).catch((fetchErr) => {
+            console.error(`Failed to fetch: ${file}`, fetchErr);
+          });
+        });
+      });
     })
   );
   // Forces the waiting service worker to become the active service worker
@@ -30,6 +41,7 @@ self.addEventListener("install", (event) => {
 
 // Event: activate (clean up old caches)
 self.addEventListener("activate", (event) => {
+  console.log("Service Worker: Activating...");
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -48,12 +60,17 @@ self.addEventListener("activate", (event) => {
 
 // Event: fetch (serve files from cache or network)
 self.addEventListener("fetch", (event) => {
-  // We only intercept requests that don't start with a special protocol
+  // Only intercept requests to our own domain
   if (event.request.url.startsWith(self.location.origin)) {
     event.respondWith(
       caches.match(event.request).then((response) => {
         // Return file from cache if found, otherwise fetch from network
-        return response || fetch(event.request);
+        return (
+          response ||
+          fetch(event.request).catch((err) => {
+            console.error("Fetch failed:", event.request.url, err);
+          })
+        );
       })
     );
   }
