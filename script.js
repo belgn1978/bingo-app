@@ -128,6 +128,7 @@ function updateFreeSpace(cell) {
 function createBingoCard90() {
   const card = document.createElement("div");
   card.classList.add("bingo-card", "bingo-card-90");
+  card.style.setProperty('--card-gradient', currentGradient);
 
   // 90-ball is 9 columns x 3 rows (27 cells total, 15 numbers, 12 blank)
   for (let row = 0; row < 3; row++) {
@@ -406,6 +407,9 @@ function applyGradient() {
   document.querySelectorAll(".cell-free-space").forEach((space) => {
     space.style.background = currentGradient;
   });
+  document.querySelectorAll(".bingo-card-90").forEach((card) => {
+    card.style.setProperty('--card-gradient', currentGradient);
+  });
 }
 
 function printCards() {
@@ -499,7 +503,16 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("load", () => {
       navigator.serviceWorker
         .register("service-worker.js")
-        .then((registration) => console.log("Service Worker registered"))
+        .then((registration) => {
+          console.log("Service Worker registered");
+          
+          // Request notification permission after service worker is registered
+          if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission().then((permission) => {
+              console.log("Notification permission:", permission);
+            });
+          }
+        })
         .catch((err) =>
           console.log("Service Worker registration failed:", err)
         );
