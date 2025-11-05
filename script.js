@@ -1,5 +1,3 @@
-/** @format */
-
 const gradients = {
   pink: "linear-gradient(90deg, #ff69b4 0%, #da70d6 25%, #ba55d3 50%, #9932cc 75%, #8b008b 100%)",
   blue: "linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)",
@@ -24,6 +22,17 @@ const shapes = {
   pumpkin: "🎃",
   gift: "🎁",
   owl: "🦉",
+  ghost: "👻",
+  firework: "🎆",
+  balloon: "🎈",
+  cake: "🎂",
+  clover: "🍀",
+  egg: "🥚",
+  flag: "🎌",
+  turkey: "🦃",
+  menorah: "🕎",
+  dreidel: "🔯",
+  bunny: "🐰",
 };
 
 function shuffleArray(array) {
