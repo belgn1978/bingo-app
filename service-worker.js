@@ -1,6 +1,6 @@
 // service-worker.js
 // Update the cache version number whenever you make changes
-const CACHE_NAME = "bingo-generator-cache-v8";
+const CACHE_NAME = "bingo-generator-cache-v9";
 
 // IMPORTANT: Files are in root directory
 // If your repo is at https://username.github.io/ (root)
@@ -10,7 +10,7 @@ const BASE_PATH = "";
 // List of all critical files to pre-cache
 const FILES_TO_CACHE = [
   `${BASE_PATH}/`,
-  `${BASE_PATH}/404.thml`,
+  `${BASE_PATH}/404.html`,
   `${BASE_PATH}/index.html`,
   `${BASE_PATH}/style.css`,
   `${BASE_PATH}/script.js`,
