@@ -1,6 +1,6 @@
 // service-worker.js
 // Update the cache version number whenever you make changes
-const CACHE_NAME = "bingo-generator-cache-v12";
+const CACHE_NAME = "bingo-generator-cache-v14";
 const BASE_PATH = "/bingo-app";
 
 // List of all critical files to pre-cache
