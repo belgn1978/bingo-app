@@ -1,5 +1,5 @@
 /**
- * style.css
+ * styles.css
  *
  * @format
  */
@@ -50,6 +50,35 @@ header h1 {
   color: #333;
   margin-bottom: 0.75rem;
   display: block;
+}
+
+.bingo-type-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.bingo-type-btn {
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.bingo-type-btn:hover {
+  border-color: #999;
+  transform: translateY(-2px);
+}
+
+.bingo-type-btn.active {
+  border-color: #4facfe;
+  background: #e3f2fd;
+  font-weight: 600;
 }
 
 .color-options {
@@ -212,9 +241,11 @@ header h1 {
   page-break-after: always;
 }
 
-.bingo-card {
+/* ===== 75-BALL BINGO CARD ===== */
+.bingo-card-75 {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: auto repeat(5, 1fr);
   gap: 2px;
   width: 100%;
   max-width: 400px;
@@ -224,6 +255,45 @@ header h1 {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 2px solid black;
+}
+
+.header-bar {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  padding: 0;
+}
+
+.header-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  padding: 0.75rem 0;
+  min-height: 50px;
+}
+
+/* ===== 90-BALL BINGO CARD ===== */
+.bingo-card-90 {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid black;
+}
+
+.bingo-card-90 .blank-cell {
+  background: #f0f0f0;
 }
 
 .cell {
@@ -260,12 +330,6 @@ header h1 {
   font-size: clamp(1rem, 3vw, 1.25rem);
   font-weight: 500;
   color: #333;
-}
-
-.cell-header {
-  color: white;
-  font-weight: 700;
-  font-size: clamp(1.25rem, 4vw, 1.75rem);
 }
 
 .cell-free-space {
@@ -336,11 +400,35 @@ header h1 {
     margin: 0 auto;
   }
 
-  .bingo-card {
+  /* 75-ball specific print styles */
+  .bingo-card-75 {
     box-shadow: none;
     border-radius: 0;
     border: none;
-    gap: 2px;
+    gap: 0;
+    margin: 0;
+    width: 100%;
+    grid-template-rows: auto repeat(5, 1fr);
+  }
+
+  .bingo-card-75 .header-bar {
+    border: 2px solid #333;
+    border-bottom: none;
+  }
+
+  .bingo-card-75 .header-cell {
+    font-size: 14pt;
+    font-weight: 900;
+    padding: 8px 0;
+    min-height: auto;
+  }
+
+  /* 90-ball specific print styles */
+  .bingo-card-90 {
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    gap: 0;
     margin: 0;
     width: 100%;
   }
@@ -352,13 +440,8 @@ header h1 {
     background: white;
   }
 
-  .cell-header {
-    border: 1px solid #333;
-  }
-
-  .cell-header .cell-content-wrapper {
-    padding-top: 100%;
-    height: 0;
+  .bingo-card-90 .blank-cell {
+    background: #e8e8e8;
   }
 
   .cell-content-wrapper {
@@ -370,14 +453,6 @@ header h1 {
     font-size: 14pt;
     font-weight: 800;
     color: black;
-    padding: 0;
-  }
-
-  .cell-header .cell-content {
-    font-size: 14pt;
-    font-weight: 900;
-    color: white;
-    background: inherit;
     padding: 0;
   }
 
@@ -394,7 +469,7 @@ header h1 {
   /* ========================================================== */
   /* ✨ CRITICAL PRINT COLOR FIX: Applies to the colored elements */
   /* ========================================================== */
-  .cell-header,
+  .header-bar,
   .cell-free-space {
     /* Force the browser to print the background color/gradient */
     -webkit-print-color-adjust: exact !important;
