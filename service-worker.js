@@ -1,6 +1,6 @@
 /** @format */
 // CRITICAL: Increment this version number every time you deploy changes
-const CACHE_NAME = "bingo-cache-v26"; // <<< UPDATED TO v26
+const CACHE_NAME = "bingo-cache-v27"; // <<< UPDATED TO v26
 
 const urlsToCache = [
   "/",
@@ -18,18 +18,18 @@ const urlsToCache = [
 // -------------------------------------------------------------
 self.addEventListener("install", (event) => {
   console.log("[ServiceWorker] Installing version:", CACHE_NAME);
-  
+
   // Force immediate activation
   self.skipWaiting();
-  
+
   event.waitUntil(
     caches
       .open(CACHE_NAME)
       .then((cache) => {
         console.log("[ServiceWorker] Caching core assets");
         // Add cache-busting query params to force fresh downloads
-        const cacheBustedUrls = urlsToCache.map(url => {
-          if (url === '/' || url.includes('manifest') || url.includes('icon')) {
+        const cacheBustedUrls = urlsToCache.map((url) => {
+          if (url === "/" || url.includes("manifest") || url.includes("icon")) {
             return url;
           }
           return `${url}?v=26`;
@@ -47,7 +47,7 @@ self.addEventListener("install", (event) => {
 // -------------------------------------------------------------
 self.addEventListener("activate", (event) => {
   console.log("[ServiceWorker] Activating version:", CACHE_NAME);
-  
+
   event.waitUntil(
     // Clear ALL old caches
     caches
@@ -67,7 +67,7 @@ self.addEventListener("activate", (event) => {
         console.log("[ServiceWorker] Claiming clients");
         return self.clients.claim();
       })
-      // DON'T force reload - let the update banner handle it
+    // DON'T force reload - let the update banner handle it
   );
 });
 
@@ -76,11 +76,11 @@ self.addEventListener("activate", (event) => {
 // -------------------------------------------------------------
 self.addEventListener("message", (event) => {
   console.log("[ServiceWorker] Received message:", event.data);
-  
+
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
-  
+
   // Respond with current version
   if (event.data && event.data.type === "GET_VERSION") {
     event.ports[0].postMessage({ version: CACHE_NAME });
@@ -92,13 +92,14 @@ self.addEventListener("message", (event) => {
 // -------------------------------------------------------------
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  
+
   // For HTML, JS, CSS files - use network-first strategy
-  if (url.pathname.endsWith('.html') || 
-      url.pathname.endsWith('.js') || 
-      url.pathname.endsWith('.css') ||
-      url.pathname === '/') {
-    
+  if (
+    url.pathname.endsWith(".html") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname === "/"
+  ) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -121,19 +122,23 @@ self.addEventListener("fetch", (event) => {
         if (cachedResponse) {
           return cachedResponse;
         }
-        
+
         return fetch(event.request).then((response) => {
-          if (!response || response.status !== 200 || response.type === "error") {
+          if (
+            !response ||
+            response.status !== 200 ||
+            response.type === "error"
+          ) {
             return response;
           }
-          
+
           if (event.request.url.startsWith(self.location.origin)) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseToCache);
             });
           }
-          
+
           return response;
         });
       })
