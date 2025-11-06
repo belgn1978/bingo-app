@@ -1,4 +1,8 @@
-/** @format */
+/**
+ * styles.css
+ *
+ * @format
+ */
 
 * {
   margin: 0;
@@ -280,6 +284,7 @@ header h1 {
   gap: 1px;
   width: 100%;
   max-width: 600px;
+  /* CRITICAL: Keep this aspect ratio for the desktop view */
   aspect-ratio: 3 / 1;
   margin: 0 auto;
   background: white;
@@ -448,13 +453,14 @@ header h1 {
 
   .page {
     width: 200mm;
-    /* Allow height to be 100% of the available viewport height */
+    /* Use min-height 100vh for robust height filling */
     min-height: 100vh;
     page-break-after: always;
     page-break-inside: avoid;
     margin: 0;
     padding: 0;
-    display: flex; /* Change to flex to manage inner container spacing */
+    /* Use flex on .page to help stretch the inner container */
+    display: flex;
     flex-direction: column;
   }
 
@@ -476,17 +482,17 @@ header h1 {
     align-items: stretch;
   }
 
-  /* 90-ball pages: 2 columns x 4 rows - FIXED HEIGHTS */
+  /* 90-ball pages: 2 columns x 4 rows */
   .container-90 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    /* 4 equal height rows */
     grid-template-rows: repeat(4, 1fr);
     gap: 2mm;
     width: 100%;
     /* Ensure it fills the flex parent (.page) vertically */
     height: 100%;
     max-width: none;
-    /* Center the grid on the page if margins exist */
     margin: auto;
     padding: 0;
     align-items: stretch;
@@ -521,18 +527,15 @@ header h1 {
     height: 100% !important;
   }
 
-  /* 90-ball specific print styles - SIMPLIFIED */
+  /* 90-ball specific print styles - CORRECTED */
   .bingo-card-90 {
     box-shadow: none !important;
     border-radius: 1mm !important;
     gap: 0 !important;
     margin: 0 !important;
     width: 100% !important;
-    /* *** FIX: Use 100% of grid cell height *** */
     height: 100% !important;
-    aspect-ratio: auto !important;
     max-width: none !important;
-    /* *** FIX: Remove fixed max height *** */
     max-height: none !important;
     padding: 0 !important;
     border: 2px solid !important;
@@ -543,5 +546,7 @@ header h1 {
     grid-template-rows: repeat(3, 1fr) !important;
     page-break-inside: avoid;
     overflow: hidden;
+    /* CRITICAL FIX: Allow the card to stretch to fill the 2x4 grid cell */
+    aspect-ratio: auto !important;
   }
 }

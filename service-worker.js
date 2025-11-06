@@ -1,6 +1,6 @@
 /** @format */
 
-const CACHE_NAME = "bingo-card-generator-v29"; // Updated version number
+const CACHE_NAME = "bingo-card-generator-v30"; // Updated version number
 const urlsToCache = [
   "./", // The main index file
   "./index.html",
