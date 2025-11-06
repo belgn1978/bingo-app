@@ -1,120 +1,116 @@
-// service-worker.js
-// Update the cache version number whenever you make changes
-const CACHE_NAME = "bingo-generator-cache-v14";
-const BASE_PATH = "/bingo-app";
+/** @format */
+// CRITICAL: Increment this version number every time you deploy changes
+const CACHE_NAME = "bingo-cache-v20"; // <<< INCREMENT THIS ON EACH DEPLOY
 
-// List of all critical files to pre-cache
-const FILES_TO_CACHE = [
-  `${BASE_PATH}/`,
-  `${BASE_PATH}/404.html`,
-  `${BASE_PATH}/index.html`,
-  `${BASE_PATH}/styles.css`,
-  `${BASE_PATH}/script.js`,
-  `${BASE_PATH}/manifest.json`,
-  `${BASE_PATH}/icon-192.png`,
-  `${BASE_PATH}/icon-512.png`,
+const urlsToCache = [
+  "/",
+  "index.html",
+  "styles.css",
+  "script.js",
+  "manifest.json",
+  "icon-512.png",
+  "icon-192.png",
+  "favicon.ico",
 ];
 
-// Event: install (pre-cache resources)
+// -------------------------------------------------------------
+// Installation Logic
+// -------------------------------------------------------------
 self.addEventListener("install", (event) => {
-  console.log("Service Worker: Installing...");
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("Service Worker: Caching App Shell");
-      return cache.addAll(FILES_TO_CACHE).catch((err) => {
-        console.error("Service Worker: Cache addAll failed:", err);
-        FILES_TO_CACHE.forEach((file) => {
-          fetch(file).catch((fetchErr) => {
-            console.error(`Failed to fetch: ${file}`, fetchErr);
-          });
-        });
-      });
-    })
-  );
-  // Forces the waiting service worker to become the active service worker
+  console.log("[ServiceWorker] Installing version:", CACHE_NAME);
+  
+  // Skip waiting to activate immediately
   self.skipWaiting();
-});
-
-// Event: activate (clean up old caches and notify about updates)
-self.addEventListener("activate", (event) => {
-  console.log("Service Worker: Activating...");
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      const deletionPromises = cacheNames.map((cacheName) => {
-        if (cacheName !== CACHE_NAME) {
-          console.log("Service Worker: Deleting old cache", cacheName);
-          return caches.delete(cacheName);
-        }
-      });
-      
-      // After cleaning up old caches, send notification about update
-      return Promise.all(deletionPromises).then(() => {
-        // Check if this is an update (not first install)
-        return self.clients.matchAll().then((clients) => {
-          if (clients.length > 0) {
-            // This is an update, show notification
-            return self.registration.showNotification("Bingo App Updated! 🎉", {
-              body: "New features are available! Open the app to see what's new.",
-              icon: `${BASE_PATH}/icon-192.png`,
-              badge: `${BASE_PATH}/icon-192.png`,
-              tag: "app-update",
-              requireInteraction: false,
-              vibrate: [200, 100, 200],
-              data: {
-                url: `${BASE_PATH}/`
-              }
-            });
-          }
-        });
-      });
-    }).then(() => {
-      // Immediately claims all clients (pages) so they start using the new worker
-      return self.clients.claim();
-    })
-  );
-});
-
-// Event: notification click
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
   
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Check if app is already open
-      for (let client of clientList) {
-        if (client.url.includes(BASE_PATH) && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // If not open, open it
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(event.notification.data.url);
-      }
-    })
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => {
+        console.log("[ServiceWorker] Caching core assets");
+        return cache.addAll(urlsToCache);
+      })
+      .catch((error) => {
+        console.error("[ServiceWorker] Failed to cache assets:", error);
+      })
   );
 });
 
-// Event: fetch (serve files from cache or network)
-self.addEventListener("fetch", (event) => {
-  // Only intercept requests to our own domain
-  if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then((response) => {
-        // Return file from cache if found, otherwise fetch from network
-        return (
-          response ||
-          fetch(event.request).catch((err) => {
-            console.error("Fetch failed:", event.request.url, err);
+// -------------------------------------------------------------
+// Activation Logic
+// -------------------------------------------------------------
+self.addEventListener("activate", (event) => {
+  console.log("[ServiceWorker] Activating version:", CACHE_NAME);
+  
+  event.waitUntil(
+    // Clear old caches
+    caches
+      .keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== CACHE_NAME) {
+              console.log("[ServiceWorker] Deleting old cache:", cacheName);
+              return caches.delete(cacheName);
+            }
           })
         );
       })
-    );
+      // Claim all clients immediately
+      .then(() => {
+        console.log("[ServiceWorker] Claiming clients");
+        return self.clients.claim();
+      })
+  );
+});
+
+// -------------------------------------------------------------
+// Message Handler (for communication from page)
+// -------------------------------------------------------------
+self.addEventListener("message", (event) => {
+  console.log("[ServiceWorker] Received message:", event.data);
+  
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+  
+  // Respond with current version
+  if (event.data && event.data.type === "GET_VERSION") {
+    event.ports[0].postMessage({ version: CACHE_NAME });
   }
 });
 
-// Event: message (listen for skip waiting messages)
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+// -------------------------------------------------------------
+// Fetch Strategy (Cache-first with network fallback)
+// -------------------------------------------------------------
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      // Return cached response if found
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      
+      // Otherwise fetch from network
+      return fetch(event.request).then((response) => {
+        // Don't cache non-successful responses
+        if (!response || response.status !== 200 || response.type === "error") {
+          return response;
+        }
+        
+        // Optionally cache the new response for future use
+        // (only for same-origin requests)
+        if (event.request.url.startsWith(self.location.origin)) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        
+        return response;
+      });
+    }).catch(() => {
+      // Return a custom offline page if you have one
+      // return caches.match('/offline.html');
+    })
+  );
 });
