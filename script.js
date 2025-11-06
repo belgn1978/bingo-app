@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   generateBtn.addEventListener("click", generateBingoCards);
   
-  // IMPROVED PRINT BUTTON
+  // IMPROVED PRINT BUTTON WITH 90-BALL FIX
   printBtn.addEventListener("click", handlePrint);
 
   function handlePrint(e) {
@@ -141,6 +141,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("✅ Cards found, initiating print...");
     
+    // FIX: Flatten 90-ball card cells for print
+    fix90BallCellsForPrint();
+    
     try {
       setTimeout(() => {
         window.print();
@@ -150,6 +153,39 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("❌ Print failed:", error);
       alert(`Print failed: ${error.message}\n\nTry using Ctrl+P (Cmd+P on Mac) instead.`);
     }
+  }
+
+  // Fix 90-ball cells by removing aspect ratio wrapper for print
+  function fix90BallCellsForPrint() {
+    const cards90 = document.querySelectorAll(".bingo-card-90");
+    console.log("Found", cards90.length, "90-ball cards to fix");
+    
+    cards90.forEach(card => {
+      const cells = card.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        const wrapper = cell.querySelector(".cell-content-wrapper");
+        const content = cell.querySelector(".cell-content");
+        
+        if (wrapper && content) {
+          // Remove wrapper and put content directly in cell
+          const contentText = content.textContent;
+          const contentClasses = content.className;
+          
+          // Clear cell
+          cell.innerHTML = '';
+          
+          // Add content directly
+          const newContent = document.createElement('div');
+          newContent.className = contentClasses;
+          newContent.textContent = contentText;
+          newContent.style.cssText = 'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 1mm;';
+          
+          cell.appendChild(newContent);
+        }
+      });
+    });
+    
+    console.log("✅ 90-ball cells flattened for print");
   }
 
   function updateFreeSpaceVisibility() {

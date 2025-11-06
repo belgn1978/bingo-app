@@ -1,6 +1,6 @@
 /** @format */
 // CRITICAL: Increment this version number every time you deploy changes
-const CACHE_NAME = "bingo-cache-v23"; // <<< UPDATED TO v21
+const CACHE_NAME = "bingo-cache-v24"; // <<< UPDATED TO v24
 
 const urlsToCache = [
   "/",
@@ -32,7 +32,7 @@ self.addEventListener("install", (event) => {
           if (url === '/' || url.includes('manifest') || url.includes('icon')) {
             return url;
           }
-          return `${url}?v=21`;
+          return `${url}?v=24`;
         });
         return cache.addAll(cacheBustedUrls);
       })
