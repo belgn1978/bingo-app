@@ -470,14 +470,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let updateBanner = null;
     let newWorker = null;
 
-    // Listen for force reload message from service worker
-    navigator.serviceWorker.addEventListener("message", (event) => {
-      if (event.data && event.data.type === "FORCE_RELOAD") {
-        console.log("[App] Force reload requested by service worker");
-        window.location.reload(true);
-      }
-    });
-
     function checkForUpdates() {
       navigator.serviceWorker.register("service-worker.js").then((registration) => {
         console.log("[App] ServiceWorker registered");
@@ -506,7 +498,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         navigator.serviceWorker.addEventListener("controllerchange", () => {
-          console.log("[App] New ServiceWorker took control");
+          console.log("[App] New ServiceWorker took control - reloading page");
+          // Only reload when controller actually changes
+          window.location.reload();
         });
       });
     }

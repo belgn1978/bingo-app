@@ -389,17 +389,23 @@ header h1 {
 }
 
 .cell-free-space .cell-content {
-  padding: 0.25rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cell-free-space .text-style {
-  font-size: clamp(1rem, 3vw, 1.25rem);
-  line-height: 1.2;
+  font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+  line-height: 1;
 }
 
 .cell-free-space .shape-style {
-  font-size: clamp(2.5rem, 6vw, 3rem);
+  font-size: clamp(3rem, 8vw, 4rem);
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 640px) {
@@ -593,13 +599,25 @@ header h1 {
     background: var(--free-space-bg-color) !important;
   }
 
+  .bingo-card-75 .cell-free-space .cell-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+
   .bingo-card-75 .cell-free-space .text-style {
     font-size: 9pt !important;
     font-weight: 900 !important;
     color: white !important;
+    line-height: 1 !important;
   }
 
   .bingo-card-75 .cell-free-space .shape-style {
-    font-size: 16pt !important;
+    font-size: 24pt !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 }

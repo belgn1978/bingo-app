@@ -1,6 +1,6 @@
 /** @format */
 // CRITICAL: Increment this version number every time you deploy changes
-const CACHE_NAME = "bingo-cache-v25"; // <<< UPDATED TO v24
+const CACHE_NAME = "bingo-cache-v26"; // <<< UPDATED TO v26
 
 const urlsToCache = [
   "/",
@@ -32,7 +32,7 @@ self.addEventListener("install", (event) => {
           if (url === '/' || url.includes('manifest') || url.includes('icon')) {
             return url;
           }
-          return `${url}?v=24`;
+          return `${url}?v=26`;
         });
         return cache.addAll(cacheBustedUrls);
       })
@@ -64,17 +64,10 @@ self.addEventListener("activate", (event) => {
       })
       // Claim all clients immediately
       .then(() => {
-        console.log("[ServiceWorker] Claiming clients and forcing reload");
+        console.log("[ServiceWorker] Claiming clients");
         return self.clients.claim();
       })
-      .then(() => {
-        // Force all clients to reload
-        return self.clients.matchAll().then((clients) => {
-          clients.forEach((client) => {
-            client.postMessage({ type: "FORCE_RELOAD" });
-          });
-        });
-      })
+      // DON'T force reload - let the update banner handle it
   );
 });
 
