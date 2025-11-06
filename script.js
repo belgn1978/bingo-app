@@ -18,9 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentColor = "default";
   let hasFreeSpace = true;
   let freeSpaceStyle = "text"; // 'text' or other emoji styles
-  let freeSpaceText = "FREE";
+  let freeSpaceText = "FREE"; // --- State Initialization ---
 
-  // --- State Initialization ---
   function initializeControls() {
     // Set initial active buttons based on state
     document.querySelectorAll(".bingo-type-btn").forEach((btn) => {
@@ -32,42 +31,36 @@ document.addEventListener("DOMContentLoaded", () => {
       if (btn.dataset.color === currentColor) {
         btn.classList.add("active");
       }
-    });
+    }); // Handle free space checkbox - only for 75-ball
 
-    // Handle free space checkbox - only for 75-ball
     const freeSpaceSection = document.getElementById("freeSpaceSection");
     const allowRepeatsSection = document.getElementById("allowRepeatsSection");
-    
     if (currentBingoType === "75") {
       freeSpaceSection.style.display = "block";
       updateFreeSpaceVisibility();
     } else {
       freeSpaceSection.style.display = "none";
-    }
+    } // Load default number of pages/cards
 
-    // Load default number of pages/cards
     numCardsInput.value = currentBingoType === "75" ? 9 : 8;
     updatePageCount();
-  }
+  } // --- Event Listeners for Controls ---
 
-  // --- Event Listeners for Controls ---
   document.querySelectorAll(".bingo-type-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       document
         .querySelectorAll(".bingo-type-btn")
         .forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      currentBingoType = btn.dataset.type;
+      currentBingoType = btn.dataset.type; // Show/hide free space section
 
-      // Show/hide free space section
       const freeSpaceSection = document.getElementById("freeSpaceSection");
       if (currentBingoType === "75") {
         freeSpaceSection.style.display = "block";
       } else {
         freeSpaceSection.style.display = "none";
-      }
+      } // Reset card and page counts based on type
 
-      // Reset card and page counts based on type
       if (currentBingoType === "75") {
         numCardsInput.value = 9;
       } else {
@@ -97,8 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("active");
       freeSpaceStyle = btn.dataset.style;
 
-      const customTextContainer = document.getElementById("customTextContainer");
-      
+      const customTextContainer = document.getElementById(
+        "customTextContainer"
+      );
       if (freeSpaceStyle === "custom") {
         customTextContainer.style.display = "block";
       } else {
@@ -115,23 +109,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   numCardsInput.addEventListener("input", updatePageCount);
 
-  generateBtn.addEventListener("click", generateBingoCards);
-  
-  // IMPROVED PRINT BUTTON
+  generateBtn.addEventListener("click", generateBingoCards); // IMPROVED PRINT BUTTON
   printBtn.addEventListener("click", handlePrint);
 
   function handlePrint(e) {
     console.log("🖨️ Print button clicked!");
-    
     if (e) {
       e.preventDefault();
       e.stopPropagation();
-    }
+    } // Check if cards exist
 
-    // Check if cards exist
-    const hasCards = container && 
-                     container.children.length > 0 && 
-                     container.querySelector(".bingo-card");
+    const hasCards =
+      container &&
+      container.children.length > 0 &&
+      container.querySelector(".bingo-card");
 
     if (!hasCards) {
       console.warn("⚠️ No cards to print");
@@ -140,7 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("✅ Cards found, initiating print...");
-    
     try {
       setTimeout(() => {
         window.print();
@@ -148,7 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 50);
     } catch (error) {
       console.error("❌ Print failed:", error);
-      alert(`Print failed: ${error.message}\n\nTry using Ctrl+P (Cmd+P on Mac) instead.`);
+      alert(
+        `Print failed: ${error.message}\n\nTry using Ctrl+P (Cmd+P on Mac) instead.`
+      );
     }
   }
 
@@ -165,16 +157,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardsPerPage = currentBingoType === "75" ? 9 : 8;
     const totalCards = parseInt(numCardsInput.value) || 0;
     const totalPages = Math.ceil(totalCards / cardsPerPage);
-    numPagesInput.value = totalPages || 0;
-    
-    // Update the info text
+    numPagesInput.value = totalPages || 0; // Update the info text
     const cardsPerPageText = document.getElementById("cardsPerPageText");
     if (cardsPerPageText) {
       cardsPerPageText.textContent = `Cards (${cardsPerPage} per page)`;
     }
-  }
+  } // --- Card Generation Logic ---
 
-  // --- Card Generation Logic ---
   function generateBingoCards() {
     const totalCards = parseInt(numCardsInput.value) || 0;
     if (totalCards <= 0) {
@@ -189,9 +178,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     for (let page = 0; page < totalPages; page++) {
       const startCard = page * cardsPerPage;
-      const endCard = Math.min(startCard + cardsPerPage, totalCards);
+      const endCard = Math.min(startCard + cardsPerPage, totalCards); // Set the container for the page
 
-      // Set the container for the page
       html += `<div class="page"><div class="container container-${currentBingoType}">`;
 
       for (let i = startCard; i < endCard; i++) {
@@ -207,34 +195,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     container.innerHTML = html;
     applyColorVariables(currentColor);
-  }
+  } // --- 75-Ball Card Generation ---
 
-  // --- 75-Ball Card Generation ---
   function generate75BallCard(id, color) {
     const cardNumbers = generate75BallNumbers();
-    let cellsHtml = "";
+    let cellsHtml = ""; // Add Header
 
-    // Add Header
     cellsHtml += `
-      <div class="header-bar" style="background: var(--header-bg-color, ${color});">
-        <div class="header-cell">B</div>
-        <div class="header-cell">I</div>
-        <div class="header-cell">N</div>
-        <div class="header-cell">G</div>
-        <div class="header-cell">O</div>
-      </div>
-    `;
+      <div class="header-bar" style="background: var(--header-bg-color, ${color});">
+        <div class="header-cell">B</div>
+        <div class="header-cell">I</div>
+        <div class="header-cell">N</div>
+        <div class="header-cell">G</div>
+        <div class="header-cell">O</div>
+      </div>
+    `; // Add Numbers and Free Space
 
-    // Add Numbers and Free Space
     for (let row = 0; row < 5; row++) {
       for (let col = 0; col < 5; col++) {
         const cellIndex = col * 5 + row;
         const isFreeSpace = row === 2 && col === 2; // Center cell
 
         if (isFreeSpace) {
-          let content = "";
-          
-          // Get the appropriate free space content
+          let content = ""; // Get the appropriate free space content
           if (freeSpaceStyle === "text") {
             content = `<span class="text-style">${freeSpaceText}</span>`;
           } else if (freeSpaceStyle === "custom") {
@@ -259,38 +242,41 @@ document.addEventListener("DOMContentLoaded", () => {
               flag: "🎌",
               menorah: "🕎",
               dreidel: "🔯",
-              owl: "🦉"
+              owl: "🦉",
             };
-            content = `<span class="shape-style">${emojiMap[freeSpaceStyle] || "⭐"}</span>`;
+            content = `<span class="shape-style">${
+              emojiMap[freeSpaceStyle] || "⭐"
+            }</span>`;
           }
 
           cellsHtml += `
-            <div class="cell cell-free-space" style="background: var(--free-space-bg-color, ${color});">
-              <div class="cell-content-wrapper">
-                <div class="cell-content">
-                  ${content}
-                </div>
-              </div>
-            </div>
-          `;
+            <div class="cell cell-free-space" style="background: var(--free-space-bg-color, ${color});">
+              <div class="cell-content-wrapper">
+                <div class="cell-content">
+                  ${content}
+                </div>
+              </div>
+            </div>
+          `;
         } else {
           cellsHtml += `
-            <div class="cell cell-number">
-              <div class="cell-content-wrapper">
-                <div class="cell-content">${cardNumbers[cellIndex]}</div>
-              </div>
-            </div>
-          `;
+            <div class="cell cell-number">
+              <div class="cell-content-wrapper">
+                <div class="cell-content">${cardNumbers[cellIndex]}</div>
+              </div>
+            </div>
+          `;
         }
       }
     }
 
-    return `<div class="bingo-card bingo-card-75" data-id="${id + 1}">${cellsHtml}</div>`;
+    return `<div class="bingo-card bingo-card-75" data-id="${
+      id + 1
+    }">${cellsHtml}</div>`;
   }
 
   function generate75BallNumbers() {
-    const numbers = [];
-    // B (1-15), I (16-30), N (31-45), G (46-60), O (61-75)
+    const numbers = []; // B (1-15), I (16-30), N (31-45), G (46-60), O (61-75)
     for (let col = 0; col < 5; col++) {
       const start = col * 15 + 1;
       const end = start + 14;
@@ -302,9 +288,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     return numbers;
-  }
+  } // --- 90-Ball Card Generation ---
 
-  // --- 90-Ball Card Generation ---
   function generate90BallCard(id, color) {
     const cardNumbers = generate90BallNumbers();
     let cellsHtml = "";
@@ -318,23 +303,24 @@ document.addEventListener("DOMContentLoaded", () => {
           cellsHtml += `<div class="cell blank-cell"><div class="cell-content-90"></div></div>`;
         } else {
           cellsHtml += `
-            <div class="cell cell-number">
-              <div class="cell-content-90">${number}</div>
-            </div>
-          `;
+            <div class="cell cell-number">
+              <div class="cell-content-90">${number}</div>
+            </div>
+          `;
         }
         cellIndex++;
       }
     }
-    return `<div class="bingo-card bingo-card-90" data-id="${id + 1}" style="--card-gradient: var(--color-${color}-gradient);">
-      ${cellsHtml}
-    </div>`;
+    return `<div class="bingo-card bingo-card-90" data-id="${
+      id + 1
+    }" style="--card-gradient: var(--color-${color}-gradient);">
+      ${cellsHtml}
+    </div>`;
   }
 
   function generate90BallNumbers() {
-    const card = Array(27).fill(null); // 3 rows * 9 columns
+    const card = Array(27).fill(null); // 3 rows * 9 columns // 1. Ensure 5 numbers per row (4 nulls per row)
 
-    // 1. Ensure 5 numbers per row (4 nulls per row)
     for (let row = 0; row < 3; row++) {
       let numSpaces = 4; // Need 4 nulls
       while (numSpaces > 0) {
@@ -345,9 +331,8 @@ document.addEventListener("DOMContentLoaded", () => {
           numSpaces--;
         }
       }
-    }
+    } // 2. Assign numbers
 
-    // 2. Assign numbers
     const columnNumbers = [];
     for (let col = 0; col < 9; col++) {
       const start = col * 10 + 1;
@@ -368,21 +353,18 @@ document.addEventListener("DOMContentLoaded", () => {
           numCount++;
         }
       }
-    }
+    } // 3. Place numbers back in the card
 
-    // 3. Place numbers back in the card
     columnNumbers.forEach((item) => {
       card[item.index] = item.number;
-    });
+    }); // 4. Set spaces to null
 
-    // 4. Set spaces to null
     for (let i = 0; i < card.length; i++) {
       if (card[i] === "SPACE") {
         card[i] = null;
       }
-    }
+    } // 5. Sort numbers within columns
 
-    // 5. Sort numbers within columns
     for (let col = 0; col < 9; col++) {
       let numbersInCol = [];
       let indicesInCol = [];
@@ -400,9 +382,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     return card;
-  }
+  } // --- Color Application Logic ---
 
-  // --- Color Application Logic ---
   function applyColorVariables(color) {
     let root = document.documentElement;
     let headerColor;
@@ -433,7 +414,8 @@ document.addEventListener("DOMContentLoaded", () => {
       case "sunset":
         headerColor = "#ff6b6b";
         freeSpaceColor = "#feca57";
-        cardGradient = "linear-gradient(90deg, #ff6b6b 0%, #feca57 50%, #ee5a6f 100%)";
+        cardGradient =
+          "linear-gradient(90deg, #ff6b6b 0%, #feca57 50%, #ee5a6f 100%)";
         break;
       case "ocean":
         headerColor = "#2e3192";
@@ -449,18 +431,16 @@ document.addEventListener("DOMContentLoaded", () => {
       default:
         headerColor = "#800080";
         freeSpaceColor = "#BA55D3";
-        cardGradient = "linear-gradient(90deg, #ff69b4 0%, #da70d6 25%, #ba55d3 50%, #9932cc 75%, #8b008b 100%)";
+        cardGradient =
+          "linear-gradient(90deg, #ff69b4 0%, #da70d6 25%, #ba55d3 50%, #9932cc 75%, #8b008b 100%)";
         break;
     }
 
     root.style.setProperty("--header-bg-color", headerColor);
     root.style.setProperty("--free-space-bg-color", freeSpaceColor);
     root.style.setProperty("--color-" + color + "-gradient", cardGradient);
-  }
+  } // ========================================================== // 🔔 PWA Update Detection & Notification System (UPDATED) // ==========================================================
 
-  // ==========================================================
-  // 🔔 PWA Update Detection & Notification System
-  // ==========================================================
   (function initUpdateDetection() {
     if (!("serviceWorker" in navigator)) {
       console.log("Service Workers not supported");
@@ -468,92 +448,102 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let updateBanner = null;
-    let newWorker = null;
+    let newWorker = null; // Store the new, waiting Service Worker
 
     function checkForUpdates() {
-      navigator.serviceWorker.register("service-worker.js").then((registration) => {
-        console.log("[App] ServiceWorker registered");
+      navigator.serviceWorker
+        .register("service-worker.js")
+        .then((registration) => {
+          console.log("[App] ServiceWorker registered"); // Check for updates immediately
 
-        // Check for updates immediately
-        registration.update();
+          registration.update(); // Check for updates every 60 seconds
 
-        // Check for updates every 60 seconds
-        setInterval(() => {
-          registration.update();
-        }, 60000);
+          setInterval(() => {
+            registration.update();
+          }, 60000); // Listen for updates
 
-        // Listen for updates
-        registration.addEventListener("updatefound", () => {
-          newWorker = registration.installing;
-          console.log("[App] New ServiceWorker found, installing...");
+          registration.addEventListener("updatefound", () => {
+            newWorker = registration.installing;
+            console.log("[App] New ServiceWorker found, installing...");
 
-          newWorker.addEventListener("statechange", () => {
-            console.log("[App] ServiceWorker state:", newWorker.state);
+            newWorker.addEventListener("statechange", () => {
+              console.log("[App] ServiceWorker state:", newWorker.state); // The key change: Check for the 'installed' state (which means 'waiting')
 
-            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              console.log("[App] New ServiceWorker installed, showing update notification");
-              showUpdateNotification();
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                console.log(
+                  "[App] New ServiceWorker installed, showing update notification"
+                ); // Pass the waiting worker to the notification function
+                showUpdateNotification(newWorker);
+              }
+            });
+          }); // This ensures that when the SW takes control (after SKIP_WAITING or closing/opening tab), the page reloads.
+
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            console.log(
+              "[App] New ServiceWorker took control - reloading page"
+            ); // Only reload if there is a waiting worker that just activated
+            if (
+              newWorker &&
+              navigator.serviceWorker.controller === registration.active
+            ) {
+              window.location.reload();
             }
           });
         });
+    } // Modified to accept the newWorker object
 
-        navigator.serviceWorker.addEventListener("controllerchange", () => {
-          console.log("[App] New ServiceWorker took control - reloading page");
-          // Only reload when controller actually changes
-          window.location.reload();
-        });
-      });
-    }
-
-    function showUpdateNotification() {
+    function showUpdateNotification(waitingWorker) {
       if (updateBanner) return;
 
       updateBanner = document.createElement("div");
       updateBanner.id = "pwa-update-banner";
       updateBanner.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
-          <p style="margin: 0; font-size: 1rem;">
-            🎉 <strong>New version available!</strong> Click 'Update' to get the latest features.
-          </p>
-          <div style="display: flex; gap: 10px;">
-            <button id="update-reload-btn" style="
-              padding: 8px 16px;
-              border: none;
-              border-radius: 4px;
-              background: white;
-              color: #4facfe;
-              font-weight: 700;
-              cursor: pointer;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-              font-size: 0.95rem;
-            ">Update Now</button>
-            <button id="update-dismiss-btn" style="
-              padding: 8px 16px;
-              border: 1px solid white;
-              border-radius: 4px;
-              background: transparent;
-              color: white;
-              font-weight: 500;
-              cursor: pointer;
-              font-size: 0.95rem;
-            ">Later</button>
-          </div>
-        </div>
-      `;
+        <div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
+          <p style="margin: 0; font-size: 1rem;">
+            🎉 <strong>New version available!</strong> Click 'Update' to get the latest features.
+          </p>
+          <div style="display: flex; gap: 10px;">
+            <button id="update-reload-btn" style="
+              padding: 8px 16px;
+              border: none;
+              border-radius: 4px;
+              background: white;
+              color: #4facfe;
+              font-weight: 700;
+              cursor: pointer;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              font-size: 0.95rem;
+            ">Update Now</button>
+            <button id="update-dismiss-btn" style="
+              padding: 8px 16px;
+              border: 1px solid white;
+              border-radius: 4px;
+              background: transparent;
+              color: white;
+              font-weight: 500;
+              cursor: pointer;
+              font-size: 0.95rem;
+            ">Later</button>
+          </div>
+        </div>
+      `;
 
       updateBanner.style.cssText = `
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 15px 20px;
-        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        text-align: center;
-        z-index: 10000;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-        animation: slideUp 0.3s ease-out;
-      `;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 15px 20px;
+        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        text-align: center;
+        z-index: 10000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        animation: slideUp 0.3s ease-out;
+      `;
 
       document.body.appendChild(updateBanner);
 
@@ -561,42 +551,47 @@ document.addEventListener("DOMContentLoaded", () => {
         const style = document.createElement("style");
         style.id = "update-banner-styles";
         style.textContent = `
-          @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-          }
-          @keyframes slideDown {
-            from { transform: translateY(0); }
-            to { transform: translateY(100%); }
-          }
-        `;
+          @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+          }
+          @keyframes slideDown {
+            from { transform: translateY(0); }
+            to { transform: translateY(100%); }
+          }
+        `;
         document.head.appendChild(style);
       }
 
-      document.getElementById("update-reload-btn").addEventListener("click", () => {
-        console.log("[App] User clicked Update Now");
-        if (newWorker) {
-          newWorker.postMessage({ type: "SKIP_WAITING" });
-        }
-        window.location.reload();
-      });
-
-      document.getElementById("update-dismiss-btn").addEventListener("click", () => {
-        console.log("[App] User dismissed update notification");
-        updateBanner.style.animation = "slideDown 0.3s ease-out";
-        setTimeout(() => {
-          if (updateBanner && updateBanner.parentNode) {
-            updateBanner.parentNode.removeChild(updateBanner);
-            updateBanner = null;
+      document
+        .getElementById("update-reload-btn")
+        .addEventListener("click", () => {
+          console.log("[App] User clicked Update Now"); // CRITICAL FIX: Send message to the waiting worker to take over immediately
+          if (waitingWorker) {
+            waitingWorker.postMessage({ type: "SKIP_WAITING" }); // The 'controllerchange' listener handles the actual reload
+          } else {
+            // Fallback if somehow the worker wasn't tracked
+            window.location.reload();
           }
-        }, 300);
-      });
+        });
+
+      document
+        .getElementById("update-dismiss-btn")
+        .addEventListener("click", () => {
+          console.log("[App] User dismissed update notification");
+          updateBanner.style.animation = "slideDown 0.3s ease-out";
+          setTimeout(() => {
+            if (updateBanner && updateBanner.parentNode) {
+              updateBanner.parentNode.removeChild(updateBanner);
+              updateBanner = null;
+            }
+          }, 300);
+        });
     }
 
     checkForUpdates();
-  })();
+  })(); // --- Initial Call ---
 
-  // --- Initial Call ---
   initializeControls();
   generateBingoCards();
 });

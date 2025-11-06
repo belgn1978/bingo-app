@@ -1,147 +1,112 @@
 /** @format */
-// CRITICAL: Increment this version number every time you deploy changes
-const CACHE_NAME = "bingo-cache-v28"; // <<< UPDATED TO v26
 
+const CACHE_NAME = "bingo-card-generator-v29"; // Updated version number
 const urlsToCache = [
-  "/",
-  "index.html",
-  "styles.css",
-  "script.js",
-  "manifest.json",
-  "icon-512.png",
-  "icon-192.png",
-  "favicon.ico",
+  "./", // The main index file
+  "./index.html",
+  "./styles.css",
+  "./script.js",
+  "./manifest.json",
+  // Add any other core assets like fonts or small images here
+  // e.g., './assets/logo.png', './fonts/lato.woff2'
 ];
 
-// -------------------------------------------------------------
-// Installation Logic
-// -------------------------------------------------------------
+// ----------------------------------------------------
+// 1. INSTALLATION (Caching assets)
+// ----------------------------------------------------
 self.addEventListener("install", (event) => {
-  console.log("[ServiceWorker] Installing version:", CACHE_NAME);
-
-  // Force immediate activation
+  console.log(`[Service Worker V29] Installing and caching shell assets.`);
+  // Wait until all files are cached
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
+    })
+  );
+  // Tell the installing service worker to activate immediately
+  // This helps new users get the app running instantly
   self.skipWaiting();
-
-  event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => {
-        console.log("[ServiceWorker] Caching core assets");
-        // Add cache-busting query params to force fresh downloads
-        const cacheBustedUrls = urlsToCache.map((url) => {
-          if (url === "/" || url.includes("manifest") || url.includes("icon")) {
-            return url;
-          }
-          return `${url}?v=26`;
-        });
-        return cache.addAll(cacheBustedUrls);
-      })
-      .catch((error) => {
-        console.error("[ServiceWorker] Failed to cache assets:", error);
-      })
-  );
 });
 
-// -------------------------------------------------------------
-// Activation Logic
-// -------------------------------------------------------------
+// ----------------------------------------------------
+// 2. ACTIVATION (Cleaning up old caches)
+// ----------------------------------------------------
 self.addEventListener("activate", (event) => {
-  console.log("[ServiceWorker] Activating version:", CACHE_NAME);
-
+  console.log(`[Service Worker V29] Activating and cleaning old caches.`);
+  // Delete all caches except the current one
+  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    // Clear ALL old caches
-    caches
-      .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
-              console.log("[ServiceWorker] Deleting old cache:", cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      // Claim all clients immediately
-      .then(() => {
-        console.log("[ServiceWorker] Claiming clients");
-        return self.clients.claim();
-      })
-    // DON'T force reload - let the update banner handle it
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log(
+              `[Service Worker V29] Deleting old cache: ${cacheName}`
+            );
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
+  // Ensure the service worker takes control of the client page immediately
+  return self.clients.claim();
 });
 
-// -------------------------------------------------------------
-// Message Handler (for communication from page)
-// -------------------------------------------------------------
-self.addEventListener("message", (event) => {
-  console.log("[ServiceWorker] Received message:", event.data);
-
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-
-  // Respond with current version
-  if (event.data && event.data.type === "GET_VERSION") {
-    event.ports[0].postMessage({ version: CACHE_NAME });
-  }
-});
-
-// -------------------------------------------------------------
-// Fetch Strategy (Network-first for HTML/JS/CSS, cache-first for assets)
-// -------------------------------------------------------------
+// ----------------------------------------------------
+// 3. FETCH (Serving content from cache or network)
+// ----------------------------------------------------
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
-
-  // For HTML, JS, CSS files - use network-first strategy
-  if (
-    url.pathname.endsWith(".html") ||
-    url.pathname.endsWith(".js") ||
-    url.pathname.endsWith(".css") ||
-    url.pathname === "/"
-  ) {
+  // We only intercept requests that are not cross-origin or special
+  if (event.request.url.startsWith(self.location.origin)) {
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // Cache the new version
-          const responseToCache = response.clone();
+      caches.match(event.request).then((response) => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+
+        // No cache hit - fetch from network
+        return fetch(event.request).then((networkResponse) => {
+          // Check if we received a valid response
+          if (
+            !networkResponse ||
+            networkResponse.status !== 200 ||
+            networkResponse.type !== "basic"
+          ) {
+            return networkResponse;
+          }
+
+          // Important: Clone the response. A response is a stream and can only be consumed once.
+          const responseToCache = networkResponse.clone();
+
+          // Cache the new response for future use (optional: only for assets outside of urlsToCache)
+          // If you want to use the 'stale-while-revalidate' strategy for all assets, uncomment this:
+          /*
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
-          return response;
-        })
-        .catch(() => {
-          // Fall back to cache if network fails
-          return caches.match(event.request);
-        })
-    );
-  } else {
-    // For images and other assets - use cache-first
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+          */
 
-        return fetch(event.request).then((response) => {
-          if (
-            !response ||
-            response.status !== 200 ||
-            response.type === "error"
-          ) {
-            return response;
-          }
-
-          if (event.request.url.startsWith(self.location.origin)) {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-
-          return response;
+          return networkResponse;
         });
       })
     );
+  } else {
+    // For cross-origin requests (e.g., Google Fonts), just use the network
+    event.respondWith(fetch(event.request));
+  }
+});
+
+// ----------------------------------------------------
+// 4. PWA UPDATE LOGIC (Critical Fix)
+// ----------------------------------------------------
+self.addEventListener("message", (event) => {
+  // This listener is used to receive messages from the main page.
+  // When the user clicks the "Update Now" button, the main script sends a SKIP_WAITING message.
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    console.log(
+      "[Service Worker V29] Received SKIP_WAITING message. Activating immediately."
+    );
+    self.skipWaiting();
   }
 });
