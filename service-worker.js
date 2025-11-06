@@ -1,6 +1,6 @@
 /** @format */
 // CRITICAL: Increment this version number every time you deploy changes
-const CACHE_NAME = "bingo-cache-v21"; // <<< INCREMENT THIS ON EACH DEPLOY
+const CACHE_NAME = "bingo-cache-v22"; // <<< UPDATED TO v21
 
 const urlsToCache = [
   "/",
@@ -19,7 +19,7 @@ const urlsToCache = [
 self.addEventListener("install", (event) => {
   console.log("[ServiceWorker] Installing version:", CACHE_NAME);
   
-  // Skip waiting to activate immediately
+  // Force immediate activation
   self.skipWaiting();
   
   event.waitUntil(
@@ -27,7 +27,14 @@ self.addEventListener("install", (event) => {
       .open(CACHE_NAME)
       .then((cache) => {
         console.log("[ServiceWorker] Caching core assets");
-        return cache.addAll(urlsToCache);
+        // Add cache-busting query params to force fresh downloads
+        const cacheBustedUrls = urlsToCache.map(url => {
+          if (url === '/' || url.includes('manifest') || url.includes('icon')) {
+            return url;
+          }
+          return `${url}?v=21`;
+        });
+        return cache.addAll(cacheBustedUrls);
       })
       .catch((error) => {
         console.error("[ServiceWorker] Failed to cache assets:", error);
@@ -42,7 +49,7 @@ self.addEventListener("activate", (event) => {
   console.log("[ServiceWorker] Activating version:", CACHE_NAME);
   
   event.waitUntil(
-    // Clear old caches
+    // Clear ALL old caches
     caches
       .keys()
       .then((cacheNames) => {
@@ -57,8 +64,16 @@ self.addEventListener("activate", (event) => {
       })
       // Claim all clients immediately
       .then(() => {
-        console.log("[ServiceWorker] Claiming clients");
+        console.log("[ServiceWorker] Claiming clients and forcing reload");
         return self.clients.claim();
+      })
+      .then(() => {
+        // Force all clients to reload
+        return self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({ type: "FORCE_RELOAD" });
+          });
+        });
       })
   );
 });
@@ -80,37 +95,55 @@ self.addEventListener("message", (event) => {
 });
 
 // -------------------------------------------------------------
-// Fetch Strategy (Cache-first with network fallback)
+// Fetch Strategy (Network-first for HTML/JS/CSS, cache-first for assets)
 // -------------------------------------------------------------
 self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Return cached response if found
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      
-      // Otherwise fetch from network
-      return fetch(event.request).then((response) => {
-        // Don't cache non-successful responses
-        if (!response || response.status !== 200 || response.type === "error") {
-          return response;
-        }
-        
-        // Optionally cache the new response for future use
-        // (only for same-origin requests)
-        if (event.request.url.startsWith(self.location.origin)) {
+  const url = new URL(event.request.url);
+  
+  // For HTML, JS, CSS files - use network-first strategy
+  if (url.pathname.endsWith('.html') || 
+      url.pathname.endsWith('.js') || 
+      url.pathname.endsWith('.css') ||
+      url.pathname === '/') {
+    
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Cache the new version
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
+          return response;
+        })
+        .catch(() => {
+          // Fall back to cache if network fails
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // For images and other assets - use cache-first
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
         }
         
-        return response;
-      });
-    }).catch(() => {
-      // Return a custom offline page if you have one
-      // return caches.match('/offline.html');
-    })
-  );
+        return fetch(event.request).then((response) => {
+          if (!response || response.status !== 200 || response.type === "error") {
+            return response;
+          }
+          
+          if (event.request.url.startsWith(self.location.origin)) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          
+          return response;
+        });
+      })
+    );
+  }
 });
