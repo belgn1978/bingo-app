@@ -1,6 +1,6 @@
 /** @format */
 // CRITICAL: Increment this version number every time you deploy changes
-const CACHE_NAME = "bingo-cache-v24"; // <<< UPDATED TO v24
+const CACHE_NAME = "bingo-cache-v25"; // <<< UPDATED TO v24
 
 const urlsToCache = [
   "/",
