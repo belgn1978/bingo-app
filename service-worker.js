@@ -1,6 +1,8 @@
+/** @format */
+
 // service-worker.js
 // Update the cache version number whenever you make changes
-const CACHE_NAME = "bingo-generator-cache-v14";
+const CACHE_NAME = "bingo-generator-cache-v15";
 const BASE_PATH = "/bingo-app";
 
 // List of all critical files to pre-cache
@@ -39,58 +41,66 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   console.log("Service Worker: Activating...");
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      const deletionPromises = cacheNames.map((cacheName) => {
-        if (cacheName !== CACHE_NAME) {
-          console.log("Service Worker: Deleting old cache", cacheName);
-          return caches.delete(cacheName);
-        }
-      });
-      
-      // After cleaning up old caches, send notification about update
-      return Promise.all(deletionPromises).then(() => {
-        // Check if this is an update (not first install)
-        return self.clients.matchAll().then((clients) => {
-          if (clients.length > 0) {
-            // This is an update, show notification
-            return self.registration.showNotification("Bingo App Updated! 🎉", {
-              body: "New features are available! Open the app to see what's new.",
-              icon: `${BASE_PATH}/icon-192.png`,
-              badge: `${BASE_PATH}/icon-192.png`,
-              tag: "app-update",
-              requireInteraction: false,
-              vibrate: [200, 100, 200],
-              data: {
-                url: `${BASE_PATH}/`
-              }
-            });
+    caches
+      .keys()
+      .then((cacheNames) => {
+        const deletionPromises = cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log("Service Worker: Deleting old cache", cacheName);
+            return caches.delete(cacheName);
           }
         });
-      });
-    }).then(() => {
-      // Immediately claims all clients (pages) so they start using the new worker
-      return self.clients.claim();
-    })
+
+        // After cleaning up old caches, send notification about update
+        return Promise.all(deletionPromises).then(() => {
+          // Check if this is an update (not first install)
+          return self.clients.matchAll().then((clients) => {
+            if (clients.length > 0) {
+              // This is an update, show notification
+              return self.registration.showNotification(
+                "Bingo App Updated! 🎉",
+                {
+                  body: "New features are available! Open the app to see what's new.",
+                  icon: `${BASE_PATH}/icon-192.png`,
+                  badge: `${BASE_PATH}/icon-192.png`,
+                  tag: "app-update",
+                  requireInteraction: false,
+                  vibrate: [200, 100, 200],
+                  data: {
+                    url: `${BASE_PATH}/`,
+                  },
+                }
+              );
+            }
+          });
+        });
+      })
+      .then(() => {
+        // Immediately claims all clients (pages) so they start using the new worker
+        return self.clients.claim();
+      })
   );
 });
 
 // Event: notification click
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  
+
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Check if app is already open
-      for (let client of clientList) {
-        if (client.url.includes(BASE_PATH) && 'focus' in client) {
-          return client.focus();
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        // Check if app is already open
+        for (let client of clientList) {
+          if (client.url.includes(BASE_PATH) && "focus" in client) {
+            return client.focus();
+          }
         }
-      }
-      // If not open, open it
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(event.notification.data.url);
-      }
-    })
+        // If not open, open it
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(event.notification.data.url);
+        }
+      })
   );
 });
 
@@ -113,8 +123,8 @@ self.addEventListener("fetch", (event) => {
 });
 
 // Event: message (listen for skip waiting messages)
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });

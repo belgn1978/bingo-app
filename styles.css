@@ -295,7 +295,7 @@ header h1 {
 }
 
 .bingo-card-90::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -303,7 +303,17 @@ header h1 {
   bottom: 0;
   border-radius: 8px;
   padding: 4px;
-  background: var(--card-gradient, linear-gradient(90deg, #ff69b4 0%, #da70d6 25%, #ba55d3 50%, #9932cc 75%, #8b008b 100%));
+  background: var(
+    --card-gradient,
+    linear-gradient(
+      90deg,
+      #ff69b4 0%,
+      #da70d6 25%,
+      #ba55d3 50%,
+      #9932cc 75%,
+      #8b008b 100%
+    )
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -430,16 +440,16 @@ header h1 {
     padding: 8mm;
   }
 
-  /* 90-ball pages: 2 columns x 4 rows, leaving bottom quarter blank */
+  /* 90-ball pages: 2 columns x 4 rows, leaving small space at bottom */
   .container-90 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 2mm;
-    height: 285mm;
+    gap: 3mm;
+    height: 280mm;
     max-width: none;
     margin: 0 auto;
-    padding: 3mm 6mm 0 6mm;
+    padding: 5mm;
   }
 
   /* 75-ball specific print styles */
@@ -517,7 +527,7 @@ header h1 {
   }
 
   .bingo-card-90 .cell-number .cell-content {
-    font-size: 16pt;
+    font-size: 18pt;
     font-weight: 800;
   }
 
