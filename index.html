@@ -1,3 +1,5 @@
+<!-- @format -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -43,10 +45,10 @@
 
       <div class="control-section">
         <label class="control-label">Card Theme (Color)</label>
-        <div class="color-options">
+        <div class="color-options" id="color-select">
           <button
             class="color-btn active"
-            data-gradient="pink"
+            data-color="default"
             style="
               background: linear-gradient(
                 90deg,
@@ -60,27 +62,27 @@
           ></button>
           <button
             class="color-btn"
-            data-gradient="blue"
+            data-color="blue"
             style="background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)"
           ></button>
           <button
             class="color-btn"
-            data-gradient="purple"
+            data-color="purple"
             style="background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)"
           ></button>
           <button
             class="color-btn"
-            data-gradient="orange"
+            data-color="orange"
             style="background: linear-gradient(90deg, #fa709a 0%, #fee140 100%)"
           ></button>
           <button
             class="color-btn"
-            data-gradient="green"
+            data-color="green"
             style="background: linear-gradient(90deg, #30cfd0 0%, #330867 100%)"
           ></button>
           <button
             class="color-btn"
-            data-gradient="sunset"
+            data-color="sunset"
             style="
               background: linear-gradient(
                 90deg,
@@ -92,12 +94,12 @@
           ></button>
           <button
             class="color-btn"
-            data-gradient="ocean"
+            data-color="ocean"
             style="background: linear-gradient(90deg, #2e3192 0%, #1bffff 100%)"
           ></button>
           <button
             class="color-btn"
-            data-gradient="fire"
+            data-color="fire"
             style="background: linear-gradient(90deg, #f12711 0%, #f5af19 100%)"
           ></button>
         </div>
@@ -105,8 +107,12 @@
 
       <div class="control-section" id="freeSpaceSection">
         <label class="control-label">Free Space Style (75-Ball Only)</label>
-        <div class="free-space-options">
-          <button class="free-space-btn active" data-style="text">
+        <div class="free-space-options" id="free-space-options">
+          <button
+            class="free-space-btn active"
+            data-style="text"
+            id="free-space-text-style"
+          >
             "Free Space" Text
           </button>
           <button class="free-space-btn" data-style="star">⭐ Star</button>
@@ -139,14 +145,18 @@
             🔯 Dreidel
           </button>
           <button class="free-space-btn" data-style="owl">🦉 Owl</button>
-          <button class="free-space-btn" data-style="custom">
+          <button
+            class="free-space-btn"
+            data-style="custom"
+            id="free-space-shape-style"
+          >
             ✏️ Custom Text
           </button>
         </div>
         <div id="customTextContainer" style="display: none; margin-top: 1rem">
           <input
             type="text"
-            id="customTextInput"
+            id="custom-text-input"
             class="custom-text-input"
             placeholder="Enter custom text..."
             value="Free Space"
@@ -160,20 +170,31 @@
         <div class="page-control">
           <input
             type="number"
-            id="pageCount"
+            id="num-cards"
+            value="9"
+            min="1"
+            max="100"
+            aria-label="Number of cards to generate"
+          />
+          <input
+            type="number"
+            id="num-pages"
             value="1"
             min="1"
             max="100"
             aria-label="Number of pages to generate"
+            style="display: none"
           />
-          <span class="info-text" id="cardsPerPageText">Pages (9 cards per page)</span>
+          <span class="info-text" id="cardsPerPageText"
+            >Cards (9 per page)</span
+          >
         </div>
       </div>
 
       <div class="control-section" id="allowRepeatsSection">
         <div class="checkbox-container">
-          <input type="checkbox" id="allowRepeats" />
-          <label for="allowRepeats"
+          <input type="checkbox" id="allow-repeats" />
+          <label for="allow-repeats"
             >Allow Repeats (Faster generation; numbers may appear on multiple
             cards)</label
           >
@@ -183,14 +204,12 @@
       <div class="control-section" style="text-align: center">
         <button
           class="btn btn-primary"
-          onclick="generateCards()"
+          id="generate-btn"
           style="margin-right: 1rem"
         >
           Generate New Cards
         </button>
-        <button class="btn btn-success" onclick="printCards()">
-          🖨️ Print Cards
-        </button>
+        <button class="btn btn-success" id="print-btn">🖨️ Print Cards</button>
       </div>
 
       <p class="info-text">
@@ -198,7 +217,7 @@
       </p>
     </div>
 
-    <div id="pages-container"></div>
+    <div id="bingo-cards-container"></div>
 
     <script src="script.js"></script>
   </body>

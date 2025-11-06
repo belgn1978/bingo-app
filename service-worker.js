@@ -1,7 +1,7 @@
 /** @format */
 
 // A critical change: You MUST update the CACHE_NAME version every time you deploy changes.
-const CACHE_NAME = "bingo-cache-v16"; // <<< SET YOUR STARTING VERSION HERE
+const CACHE_NAME = "bingo-cache-v17"; // <<< SET YOUR STARTING VERSION HERE
 
 const urlsToCache = [
   "/",
