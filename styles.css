@@ -406,9 +406,14 @@ header h1 {
 }
 
 /* ========================================================== */
-/* ✨ PRINT MEDIA STYLES - WITH CORRECTIONS */
+/* ✨ PRINT MEDIA STYLES */
 /* ========================================================== */
 @media print {
+  @page {
+    size: A4;
+    margin: 8mm;
+  }
+
   body {
     background: white;
     padding: 0;
@@ -417,7 +422,7 @@ header h1 {
 
   header,
   .controls-container {
-    display: none;
+    display: none !important;
   }
 
   .page {
@@ -425,22 +430,25 @@ header h1 {
     height: 297mm;
     page-break-after: always;
     margin: 0;
+    padding: 0;
+    display: block;
   }
 
   .page:last-child {
     page-break-after: auto;
   }
 
-  /* 75-ball pages */
+  /* 75-ball pages: 3x3 grid */
   .container-75 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 4mm;
+    gap: 5mm;
+    width: 100%;
     height: 100%;
     max-width: none;
-    margin: 0 auto;
-    padding: 8mm;
+    margin: 0;
+    padding: 0;
   }
 
   /* 90-ball pages: 2 columns x 4 rows */
@@ -448,33 +456,36 @@ header h1 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 4mm;
-    height: 100%; /* FIX: Ensures container fills vertical space */
+    gap: 3mm;
+    width: 100%;
+    height: 281mm; /* A4 height minus margins */
     max-width: none;
     margin: 0;
-    padding: 5mm 4mm; /* Adjusted padding for better fit */
+    padding: 0;
   }
 
   /* 75-ball specific print styles */
   .bingo-card-75 {
     box-shadow: none;
     border-radius: 0;
-    border: none;
+    border: 2px solid #333;
     gap: 0;
     margin: 0;
     width: 100%;
+    height: 100%;
+    max-width: none;
     grid-template-rows: auto repeat(5, 1fr);
   }
 
   .bingo-card-75 .header-bar {
-    border: 2px solid #333;
-    border-bottom: none;
+    border: none;
+    border-bottom: 2px solid #333;
   }
 
   .bingo-card-75 .header-cell {
     font-size: 14pt;
     font-weight: 900;
-    padding: 8px 0;
+    padding: 6px 0;
     min-height: auto;
   }
 
@@ -485,9 +496,9 @@ header h1 {
     gap: 0;
     margin: 0;
     width: 100%;
-    height: 100%; /* FIX: Ensures card fills its allocated grid cell */
-    padding: 0;
+    height: 100%;
     max-width: none;
+    padding: 0;
     border: 2px solid;
     border-image-slice: 1;
     border-image-source: var(--card-gradient);
@@ -504,8 +515,9 @@ header h1 {
     position: relative;
     z-index: 1;
     background: white;
-    border: 0.5px solid #ccc;
+    border: 0.5px solid #999;
     min-height: 0;
+    height: 100%;
   }
 
   .bingo-card-90 .blank-cell {
@@ -526,48 +538,49 @@ header h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2px;
+    padding: 1px;
   }
 
   .bingo-card-90 .cell-number .cell-content {
-    font-size: 18pt;
-    font-weight: 800;
+    font-size: 14pt;
+    font-weight: 700;
   }
 
-  .cell {
+  /* General cell styles for 75-ball */
+  .bingo-card-75 .cell {
     position: relative;
     box-sizing: border-box;
     border: 1px solid #333;
     background: white;
+    height: 100%;
   }
 
-  .cell-content-wrapper {
+  .bingo-card-75 .cell-content-wrapper {
     padding-top: 100%;
     height: 0;
   }
 
-  .cell-number .cell-content {
+  .bingo-card-75 .cell-number .cell-content {
     font-size: 11pt;
     font-weight: 800;
     color: black;
     padding: 0;
   }
 
-  .cell-free-space .cell-content.text-style {
-    font-size: 12pt;
+  .bingo-card-75 .cell-free-space .cell-content.text-style {
+    font-size: 10pt;
     font-weight: 900;
-    color: black;
+    color: white;
   }
 
-  .cell-free-space .cell-content.shape-style {
+  .bingo-card-75 .cell-free-space .cell-content.shape-style {
     font-size: 18pt;
   }
 
-  /* CRITICAL PRINT COLOR FIX: Applies to the colored elements */
+  /* Force print colors */
   .header-bar,
   .cell-free-space,
   .bingo-card-90 {
-    /* Force the browser to print the background color/gradient */
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
     print-color-adjust: exact !important;
