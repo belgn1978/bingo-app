@@ -448,12 +448,14 @@ header h1 {
 
   .page {
     width: 200mm;
-    height: 287mm;
+    /* Allow height to be 100% of the available viewport height */
+    min-height: 100vh;
     page-break-after: always;
     page-break-inside: avoid;
     margin: 0;
     padding: 0;
-    display: block;
+    display: flex; /* Change to flex to manage inner container spacing */
+    flex-direction: column;
   }
 
   .page:last-child {
@@ -478,13 +480,14 @@ header h1 {
   .container-90 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    /* *** FIX: Use flexible fr unit for rows *** */
     grid-template-rows: repeat(4, 1fr);
     gap: 2mm;
     width: 100%;
-    height: 100%; /* Use 100% of page height */
+    /* Ensure it fills the flex parent (.page) vertically */
+    height: 100%;
     max-width: none;
-    margin: 0;
+    /* Center the grid on the page if margins exist */
+    margin: auto;
     padding: 0;
     align-items: stretch;
   }
