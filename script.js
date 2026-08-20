@@ -1,103 +1,97 @@
 /** @format */
 
 document.addEventListener("DOMContentLoaded", () => {
-  const bingoTypeSelect = document.getElementById("bingo-type");
-  const colorSelect = document.getElementById("color-select");
-  const freeSpaceCheck = document.getElementById("free-space-check");
-  const freeSpaceOptions = document.getElementById("free-space-options");
-  const freeSpaceTextStyle = document.getElementById("free-space-text-style");
-  const freeSpaceShapeStyle = document.getElementById("free-space-shape-style");
   const customTextInput = document.getElementById("custom-text-input");
-  const numCardsInput = document.getElementById("num-cards");
   const numPagesInput = document.getElementById("num-pages");
+  const pageBackgroundSelect = document.getElementById("page-background");
   const generateBtn = document.getElementById("generate-btn");
   const printBtn = document.getElementById("print-btn");
+  const allowRepeatsInput = document.getElementById("allow-repeats");
   const container = document.getElementById("bingo-cards-container");
 
-  let currentBingoType = "75";
-  let currentColor = "default";
-  let hasFreeSpace = true;
-  let freeSpaceStyle = "text"; // 'text' or other emoji styles
-  let freeSpaceText = "FREE"; // --- State Initialization ---
+  let refreshing = false;
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register("./service-worker.js", { updateViaCache: "none" })
+      .then((registration) => {
+        registration.update();
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener("statechange", () => {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
+              newWorker.postMessage({ type: "SKIP_WAITING" });
+            }
+          });
+        });
+      })
+      .catch((error) => console.error("Service worker registration failed:", error));
 
-  function initializeControls() {
-    // Set initial active buttons based on state
-    document.querySelectorAll(".bingo-type-btn").forEach((btn) => {
-      if (btn.dataset.type === currentBingoType) {
-        btn.classList.add("active");
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
       }
     });
-    document.querySelectorAll(".color-btn").forEach((btn) => {
-      if (btn.dataset.color === currentColor) {
-        btn.classList.add("active");
-      }
-    }); // Handle free space checkbox - only for 75-ball
+  }
 
-    const freeSpaceSection = document.getElementById("freeSpaceSection");
-    const allowRepeatsSection = document.getElementById("allowRepeatsSection");
-    if (currentBingoType === "75") {
-      freeSpaceSection.style.display = "block";
-      updateFreeSpaceVisibility();
-    } else {
-      freeSpaceSection.style.display = "none";
-    } // Load default number of pages/cards
+  let currentColor = "default";
+  let freeSpaceStyle = "text";
+  let freeSpaceText = "FREE";
+  let pageBackground = "none";
 
-    numCardsInput.value = currentBingoType === "75" ? 9 : 8;
-    updatePageCount();
-  } // --- Event Listeners for Controls ---
+  const colorThemes = {
+    default: ["#ff69b4", "#8b008b"],
+    blue: ["#4facfe", "#00a6c7"],
+    purple: ["#a18cd1", "#8f6fc1"],
+    orange: ["#fa709a", "#e7a516"],
+    green: ["#30cfd0", "#148f78"],
+    sunset: ["#ff6b6b", "#ee5a6f"],
+    ocean: ["#2e3192", "#168f9d"],
+    fire: ["#f12711", "#d47b0b"],
+  };
 
-  document.querySelectorAll(".bingo-type-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document
-        .querySelectorAll(".bingo-type-btn")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentBingoType = btn.dataset.type; // Show/hide free space section
+  const freeSpaceColors = {
+    text: "#d8b4fe",
+    custom: "#d8b4fe",
+    star: "#f6c945",
+    heart: "#ff9eb5",
+    tree: "#9bd3a8",
+    snowflake: "#b9e8ff",
+    pumpkin: "#ffc27d",
+    ghost: "#d9dde3",
+    turkey: "#d9b08c",
+    gift: "#f4a6b8",
+    firework: "#b8a4ff",
+    balloon: "#a8d8ff",
+    cake: "#ffc4d6",
+    clover: "#a8d5a2",
+    egg: "#fff0b3",
+    bunny: "#f2d4e7",
+    flag: "#f4b5b5",
+    menorah: "#c7d2e8",
+    dreidel: "#b8c9f5",
+    owl: "#c6b49a",
+  };
 
-      const freeSpaceSection = document.getElementById("freeSpaceSection");
-      if (currentBingoType === "75") {
-        freeSpaceSection.style.display = "block";
-      } else {
-        freeSpaceSection.style.display = "none";
-      } // Reset card and page counts based on type
-
-      if (currentBingoType === "75") {
-        numCardsInput.value = 9;
-      } else {
-        numCardsInput.value = 8;
-      }
-      updatePageCount();
+  document.querySelectorAll(".color-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".color-btn").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      currentColor = button.dataset.color;
       generateBingoCards();
     });
   });
 
-  document.querySelectorAll(".color-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document
-        .querySelectorAll(".color-btn")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentColor = btn.dataset.color;
-      generateBingoCards(); // Re-generate to apply new color/gradient
-    });
-  });
-
-  document.querySelectorAll(".free-space-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document
-        .querySelectorAll(".free-space-btn")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      freeSpaceStyle = btn.dataset.style;
-
-      const customTextContainer = document.getElementById(
-        "customTextContainer"
-      );
-      if (freeSpaceStyle === "custom") {
-        customTextContainer.style.display = "block";
-      } else {
-        customTextContainer.style.display = "none";
-      }
+  document.querySelectorAll(".free-space-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".free-space-btn").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      freeSpaceStyle = button.dataset.style;
+      document.getElementById("customTextContainer").style.display =
+        freeSpaceStyle === "custom" ? "block" : "none";
       generateBingoCards();
     });
   });
@@ -107,491 +101,234 @@ document.addEventListener("DOMContentLoaded", () => {
     generateBingoCards();
   });
 
-  numCardsInput.addEventListener("input", updatePageCount);
-
-  generateBtn.addEventListener("click", generateBingoCards); // IMPROVED PRINT BUTTON
-  printBtn.addEventListener("click", handlePrint);
-
-  function handlePrint(e) {
-    console.log("🖨️ Print button clicked!");
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    } // Check if cards exist
-
-    const hasCards =
-      container &&
-      container.children.length > 0 &&
-      container.querySelector(".bingo-card");
-
-    if (!hasCards) {
-      console.warn("⚠️ No cards to print");
+  numPagesInput.addEventListener("input", generateBingoCards);
+  pageBackgroundSelect.addEventListener("change", () => {
+    pageBackground = pageBackgroundSelect.value;
+    generateBingoCards();
+  });
+  allowRepeatsInput.addEventListener("change", generateBingoCards);
+  generateBtn.addEventListener("click", generateBingoCards);
+  printBtn.addEventListener("click", () => {
+    if (!container.querySelector(".bingo-card")) {
       alert("Please generate bingo cards first!");
       return;
     }
+    window.print();
+  });
 
-    console.log("✅ Cards found, initiating print...");
-    try {
-      setTimeout(() => {
-        window.print();
-        console.log("✅ Print dialog opened");
-      }, 50);
-    } catch (error) {
-      console.error("❌ Print failed:", error);
-      alert(
-        `Print failed: ${error.message}\n\nTry using Ctrl+P (Cmd+P on Mac) instead.`
-      );
+  function shuffle(values) {
+    for (let index = values.length - 1; index > 0; index--) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [values[index], values[swapIndex]] = [values[swapIndex], values[index]];
     }
+    return values;
   }
 
-  function updateFreeSpaceVisibility() {
-    const customTextContainer = document.getElementById("customTextContainer");
-    if (freeSpaceStyle === "custom") {
-      customTextContainer.style.display = "block";
-    } else {
-      customTextContainer.style.display = "none";
-    }
+  function createColumnPools() {
+    if (allowRepeatsInput.checked) return null;
+    return Array.from({ length: 5 }, (_, column) =>
+      shuffle(Array.from({ length: 15 }, (_, offset) => column * 15 + offset + 1))
+    );
   }
 
-  function updatePageCount() {
-    const cardsPerPage = currentBingoType === "75" ? 9 : 8;
-    const totalCards = parseInt(numCardsInput.value) || 0;
-    const totalPages = Math.ceil(totalCards / cardsPerPage);
-    numPagesInput.value = totalPages || 0; // Update the info text
-    const cardsPerPageText = document.getElementById("cardsPerPageText");
-    if (cardsPerPageText) {
-      cardsPerPageText.textContent = `Cards (${cardsPerPage} per page)`;
-    }
-  } // --- Card Generation Logic ---
-
-  function generateBingoCards() {
-    const totalCards = parseInt(numCardsInput.value) || 0;
-    if (totalCards <= 0) {
-      container.innerHTML =
-        '<p class="info-text">Enter the number of cards to generate.</p>';
-      return;
-    }
-
-    const cardsPerPage = currentBingoType === "75" ? 9 : 8;
-    const totalPages = parseInt(numPagesInput.value) || 0;
-    let html = "";
-
-    for (let page = 0; page < totalPages; page++) {
-      const startCard = page * cardsPerPage;
-      const endCard = Math.min(startCard + cardsPerPage, totalCards); // Set the container for the page
-
-      html += `<div class="page"><div class="container container-${currentBingoType}">`;
-
-      for (let i = startCard; i < endCard; i++) {
-        if (currentBingoType === "75") {
-          html += generate75BallCard(i, currentColor);
-        } else {
-          html += generate90BallCard(i, currentColor);
-        }
-      }
-
-      html += "</div></div>";
-    }
-
-    container.innerHTML = html;
-    applyColorVariables(currentColor);
-  } // --- 75-Ball Card Generation ---
-
-  function generate75BallCard(id, color) {
-    const cardNumbers = generate75BallNumbers();
-    let cellsHtml = ""; // Add Header
-
-    cellsHtml += `
-      <div class="header-bar" style="background: var(--header-bg-color, ${color});">
-        <div class="header-cell">B</div>
-        <div class="header-cell">I</div>
-        <div class="header-cell">N</div>
-        <div class="header-cell">G</div>
-        <div class="header-cell">O</div>
-      </div>
-    `; // Add Numbers and Free Space
-
-    for (let row = 0; row < 5; row++) {
-      for (let col = 0; col < 5; col++) {
-        const cellIndex = col * 5 + row;
-        const isFreeSpace = row === 2 && col === 2; // Center cell
-
-        if (isFreeSpace) {
-          let content = ""; // Get the appropriate free space content
-          if (freeSpaceStyle === "text") {
-            content = `<span class="text-style">${freeSpaceText}</span>`;
-          } else if (freeSpaceStyle === "custom") {
-            content = `<span class="text-style">${freeSpaceText}</span>`;
-          } else {
-            // Emoji styles
-            const emojiMap = {
-              star: "⭐",
-              heart: "❤️",
-              tree: "🎄",
-              snowflake: "❄️",
-              pumpkin: "🎃",
-              ghost: "👻",
-              turkey: "🦃",
-              gift: "🎁",
-              firework: "🎆",
-              balloon: "🎈",
-              cake: "🎂",
-              clover: "🍀",
-              egg: "🥚",
-              bunny: "🐰",
-              flag: "🎌",
-              menorah: "🕎",
-              dreidel: "🔯",
-              owl: "🦉",
-            };
-            content = `<span class="shape-style">${
-              emojiMap[freeSpaceStyle] || "⭐"
-            }</span>`;
-          }
-
-          cellsHtml += `
-            <div class="cell cell-free-space" style="background: var(--free-space-bg-color, ${color});">
-              <div class="cell-content-wrapper">
-                <div class="cell-content">
-                  ${content}
-                </div>
-              </div>
-            </div>
-          `;
-        } else {
-          cellsHtml += `
-            <div class="cell cell-number">
-              <div class="cell-content-wrapper">
-                <div class="cell-content">${cardNumbers[cellIndex]}</div>
-              </div>
-            </div>
-          `;
-        }
-      }
-    }
-
-    return `<div class="bingo-card bingo-card-75" data-id="${
-      id + 1
-    }">${cellsHtml}</div>`;
+  function getPageBackground() {
+    if (pageBackground === "none") return "#ffffff";
+    const [start, end] = colorThemes[currentColor] || colorThemes.default;
+    return `linear-gradient(135deg, ${start}1c, ${end}30)`;
   }
 
-  function generate75BallNumbers() {
-    const numbers = []; // B (1-15), I (16-30), N (31-45), G (46-60), O (61-75)
-    for (let col = 0; col < 5; col++) {
-      const start = col * 15 + 1;
-      const end = start + 14;
-      const columnNumbers = Array.from({ length: 15 }, (_, i) => start + i)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 5);
-      for (let row = 0; row < 5; row++) {
-        numbers.push(columnNumbers[row]);
-      }
+  function generate75BallNumbers(columnPools) {
+    const numbers = [];
+    for (let column = 0; column < 5; column++) {
+      const start = column * 15 + 1;
+      const values = columnPools
+        ? columnPools[column].splice(0, 5)
+        : shuffle(Array.from({ length: 15 }, (_, offset) => start + offset)).slice(0, 5);
+      values.sort((a, b) => a - b);
+      numbers.push(...values);
     }
     return numbers;
-  } // --- 90-Ball Card Generation ---
-
-  function generate90BallCard(id, color) {
-    const cardNumbers = generate90BallNumbers();
-    let cellsHtml = "";
-    let cellIndex = 0;
-
-    for (let row = 0; row < 3; row++) {
-      for (let col = 0; col < 9; col++) {
-        const number = cardNumbers[cellIndex];
-
-        if (number === null) {
-          cellsHtml += `<div class="cell blank-cell"><div class="cell-content-90"></div></div>`;
-        } else {
-          cellsHtml += `
-            <div class="cell cell-number">
-              <div class="cell-content-90">${number}</div>
-            </div>
-          `;
-        }
-        cellIndex++;
-      }
-    }
-    return `<div class="bingo-card bingo-card-90" data-id="${
-      id + 1
-    }" style="--card-gradient: var(--color-${color}-gradient);">
-      ${cellsHtml}
-    </div>`;
   }
 
-  function generate90BallNumbers() {
-    const card = Array(27).fill(null); // 3 rows * 9 columns // 1. Ensure 5 numbers per row (4 nulls per row)
-
-    for (let row = 0; row < 3; row++) {
-      let numSpaces = 4; // Need 4 nulls
-      while (numSpaces > 0) {
-        const col = Math.floor(Math.random() * 9);
-        const index = row * 9 + col;
-        if (card[index] === null) {
-          card[index] = "SPACE"; // Temporary marker for a null cell
-          numSpaces--;
-        }
-      }
-    } // 2. Assign numbers
-
-    const columnNumbers = [];
-    for (let col = 0; col < 9; col++) {
-      const start = col * 10 + 1;
-      const end = col === 8 ? 90 : (col + 1) * 10;
-      const availableNumbers = Array.from(
-        { length: end - start + 1 },
-        (_, i) => start + i
-      ).sort(() => Math.random() - 0.5);
-
-      let numCount = 0;
-      for (let row = 0; row < 3; row++) {
-        const index = row * 9 + col;
-        if (card[index] !== "SPACE") {
-          columnNumbers.push({
-            index: index,
-            number: availableNumbers[numCount],
-          });
-          numCount++;
-        }
-      }
-    } // 3. Place numbers back in the card
-
-    columnNumbers.forEach((item) => {
-      card[item.index] = item.number;
-    }); // 4. Set spaces to null
-
-    for (let i = 0; i < card.length; i++) {
-      if (card[i] === "SPACE") {
-        card[i] = null;
-      }
-    } // 5. Sort numbers within columns
-
-    for (let col = 0; col < 9; col++) {
-      let numbersInCol = [];
-      let indicesInCol = [];
-      for (let row = 0; row < 3; row++) {
-        const index = row * 9 + col;
-        if (card[index] !== null) {
-          numbersInCol.push(card[index]);
-          indicesInCol.push(index);
-        }
-      }
-      numbersInCol.sort((a, b) => a - b);
-      indicesInCol.forEach((index, i) => {
-        card[index] = numbersInCol[i];
-      });
+  function getFreeSpaceContent() {
+    if (freeSpaceStyle === "text" || freeSpaceStyle === "custom") {
+      return `<span class="text-style">${escapeHtml(freeSpaceText)}</span>`;
     }
+    const emojiMap = {
+      star: "⭐", heart: "❤️", tree: "🎄", snowflake: "❄️", pumpkin: "🎃",
+      ghost: "👻", turkey: "🦃", gift: "🎁", firework: "🎆", balloon: "🎈",
+      cake: "🎂", clover: "🍀", egg: "🥚", bunny: "🐰", flag: "🎌",
+      menorah: "🕎", dreidel: "🔯", owl: "🦉",
+    };
+    return `<span class="shape-style">${emojiMap[freeSpaceStyle] || "⭐"}</span>`;
+  }
 
-    return card;
-  } // --- Color Application Logic ---
+  function getPageArtwork() {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 1600;
+    const context = canvas.getContext("2d");
+    const [start, end] = colorThemes[currentColor] || colorThemes.default;
+    const accent = freeSpaceColors[freeSpaceStyle] || freeSpaceColors.text;
+    const gradient = context.createLinearGradient(0, 0, 1200, 1600);
+    gradient.addColorStop(0, start);
+    gradient.addColorStop(1, end);
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 1200, 1600);
+    context.globalAlpha = 0.3;
+    context.fillStyle = accent;
+    context.beginPath();
+    context.arc(930, 250, 170, 0, Math.PI * 2);
+    context.fill();
+    context.globalAlpha = 0.5;
+    context.fillStyle = end;
+    context.beginPath();
+    context.moveTo(0, 1080);
+    context.quadraticCurveTo(260, 850, 520, 1080);
+    context.quadraticCurveTo(850, 850, 1200, 1020);
+    context.lineTo(1200, 1600);
+    context.lineTo(0, 1600);
+    context.fill();
+    context.globalAlpha = 0.22;
+    context.fillStyle = start;
+    context.fillRect(0, 1250, 1200, 350);
+    context.globalAlpha = 1;
+    drawSceneDetails(context, accent, start, end);
+    return canvas.toDataURL("image/png");
+  }
 
-  function applyColorVariables(color) {
-    let root = document.documentElement;
-    let headerColor;
-    let freeSpaceColor;
-    let cardGradient;
-
-    switch (color) {
-      case "blue":
-        headerColor = "#4facfe";
-        freeSpaceColor = "#00f2fe";
-        cardGradient = "linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)";
-        break;
-      case "purple":
-        headerColor = "#a18cd1";
-        freeSpaceColor = "#fbc2eb";
-        cardGradient = "linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)";
-        break;
-      case "orange":
-        headerColor = "#fa709a";
-        freeSpaceColor = "#fee140";
-        cardGradient = "linear-gradient(90deg, #fa709a 0%, #fee140 100%)";
-        break;
-      case "green":
-        headerColor = "#30cfd0";
-        freeSpaceColor = "#330867";
-        cardGradient = "linear-gradient(90deg, #30cfd0 0%, #330867 100%)";
-        break;
-      case "sunset":
-        headerColor = "#ff6b6b";
-        freeSpaceColor = "#feca57";
-        cardGradient =
-          "linear-gradient(90deg, #ff6b6b 0%, #feca57 50%, #ee5a6f 100%)";
-        break;
-      case "ocean":
-        headerColor = "#2e3192";
-        freeSpaceColor = "#1bffff";
-        cardGradient = "linear-gradient(90deg, #2e3192 0%, #1bffff 100%)";
-        break;
-      case "fire":
-        headerColor = "#f12711";
-        freeSpaceColor = "#f5af19";
-        cardGradient = "linear-gradient(90deg, #f12711 0%, #f5af19 100%)";
-        break;
-      case "default":
-      default:
-        headerColor = "#800080";
-        freeSpaceColor = "#BA55D3";
-        cardGradient =
-          "linear-gradient(90deg, #ff69b4 0%, #da70d6 25%, #ba55d3 50%, #9932cc 75%, #8b008b 100%)";
-        break;
+  function drawSceneDetails(context, accent, start, end) {
+    context.globalAlpha = 0.48;
+    context.strokeStyle = end;
+    context.lineWidth = 28;
+    for (let index = 0; index < 7; index++) {
+      const x = 90 + index * 175;
+      context.beginPath();
+      context.moveTo(x, 1250);
+      context.lineTo(x + 90, 720 + (index % 3) * 80);
+      context.stroke();
     }
-
-    root.style.setProperty("--header-bg-color", headerColor);
-    root.style.setProperty("--free-space-bg-color", freeSpaceColor);
-    root.style.setProperty("--color-" + color + "-gradient", cardGradient);
-  } // ========================================================== // 🔔 PWA Update Detection & Notification System (UPDATED) // ==========================================================
-
-  (function initUpdateDetection() {
-    if (!("serviceWorker" in navigator)) {
-      console.log("Service Workers not supported");
-      return;
+    context.globalAlpha = 0.7;
+    context.fillStyle = accent;
+    if (freeSpaceStyle === "ghost" || freeSpaceStyle === "pumpkin") {
+      context.fillRect(760, 760, 290, 270);
+      context.beginPath();
+      context.moveTo(720, 760);
+      context.lineTo(905, 590);
+      context.lineTo(1090, 760);
+      context.fill();
+      context.fillStyle = end;
+      context.fillRect(825, 820, 50, 70);
+      context.fillRect(930, 820, 50, 70);
+    } else if (freeSpaceStyle === "owl" || freeSpaceStyle === "tree") {
+      context.beginPath();
+      context.moveTo(600, 650);
+      context.lineTo(390, 1080);
+      context.lineTo(810, 1080);
+      context.closePath();
+      context.fill();
+      context.beginPath();
+      context.moveTo(600, 760);
+      context.lineTo(420, 1200);
+      context.lineTo(780, 1200);
+      context.closePath();
+      context.fill();
+    } else if (freeSpaceStyle === "bunny" || freeSpaceStyle === "egg") {
+      context.beginPath();
+      context.ellipse(600, 1100, 110, 135, 0, 0, Math.PI * 2);
+      context.fill();
+      context.fillRect(545, 850, 35, 180);
+      context.fillRect(620, 850, 35, 180);
+    } else if (freeSpaceStyle === "gift" || freeSpaceStyle === "cake") {
+      context.fillRect(430, 1000, 340, 280);
+      context.fillStyle = end;
+      context.fillRect(585, 1000, 30, 280);
+      context.fillRect(430, 1080, 340, 30);
+    } else {
+      context.beginPath();
+      context.arc(600, 980, 170, 0, Math.PI * 2);
+      context.fill();
+      context.strokeStyle = end;
+      context.lineWidth = 24;
+      for (let index = 0; index < 8; index++) {
+        const angle = (Math.PI * 2 * index) / 8;
+        context.beginPath();
+        context.moveTo(600, 980);
+        context.lineTo(600 + Math.cos(angle) * 300, 980 + Math.sin(angle) * 300);
+        context.stroke();
+      }
     }
+    context.globalAlpha = 1;
+  }
 
-    let updateBanner = null;
-    let newWorker = null; // Store the new, waiting Service Worker
+  function escapeHtml(value) {
+    return value.replace(/[&<>'"]/g, (character) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
+    })[character]);
+  }
 
-    function checkForUpdates() {
-      navigator.serviceWorker
-        .register("service-worker.js")
-        .then((registration) => {
-          console.log("[App] ServiceWorker registered"); // Check for updates immediately
+  function generate75BallCard(id, columnPools) {
+    const numbers = generate75BallNumbers(columnPools);
+    let cellsHtml = `<div class="header-bar"><div class="header-cell">B</div><div class="header-cell">I</div><div class="header-cell">N</div><div class="header-cell">G</div><div class="header-cell">O</div></div>`;
+    for (let row = 0; row < 5; row++) {
+      for (let column = 0; column < 5; column++) {
+        const isFreeSpace = row === 2 && column === 2;
+        const number = numbers[column * 5 + row];
+        const content = isFreeSpace ? getFreeSpaceContent() : `<span>${number}</span>`;
+        cellsHtml += `<div class="cell ${isFreeSpace ? "cell-free-space" : "cell-number"}"><div class="cell-content-wrapper"><div class="cell-content">${content}</div></div></div>`;
+      }
+    }
+    return `<div class="bingo-card bingo-card-75" data-id="${id + 1}">${cellsHtml}</div>`;
+  }
 
-          registration.update(); // Check for updates every 60 seconds
+  function getCardSignature(card) {
+    return Array.from(card.querySelectorAll(".cell-number span"), (cell) => cell.textContent).join(",");
+  }
 
-          setInterval(() => {
-            registration.update();
-          }, 60000); // Listen for updates
+  function applyColorVariables() {
+    const [start, end] = colorThemes[currentColor] || colorThemes.default;
+    document.documentElement.style.setProperty("--header-bg-color", `linear-gradient(90deg, ${start}, ${end})`);
+    document.documentElement.style.setProperty("--card-border-color", end);
+  }
 
-          registration.addEventListener("updatefound", () => {
-            newWorker = registration.installing;
-            console.log("[App] New ServiceWorker found, installing...");
+  function generateBingoCards() {
+    const totalPages = Math.min(10, Math.max(1, parseInt(numPagesInput.value, 10) || 1));
+    numPagesInput.value = totalPages;
+    const cardsPerPage = 9;
+    let html = "";
+    const signatures = new Set();
 
-            newWorker.addEventListener("statechange", () => {
-              console.log("[App] ServiceWorker state:", newWorker.state); // The key change: Check for the 'installed' state (which means 'waiting')
-
-              if (
-                newWorker.state === "installed" &&
-                navigator.serviceWorker.controller
-              ) {
-                console.log(
-                  "[App] New ServiceWorker installed, showing update notification"
-                ); // Pass the waiting worker to the notification function
-                showUpdateNotification(newWorker);
-              }
+    for (let page = 0; page < totalPages; page++) {
+      const columnPoolsByGroup = Array.from({ length: 3 }, createColumnPools);
+      const themedClass = pageBackground === "themed" ? " page-themed" : "";
+      let pageHtml = `<div class="page${themedClass}" data-free-space="${freeSpaceStyle}" style="--page-background: ${getPageBackground()};"><div class="page-artwork-wrap" aria-hidden="true"><img class="page-artwork" src="${getPageArtwork()}" alt="" /></div><div class="container container-75">`;
+      for (let cardOnPage = 0; cardOnPage < cardsPerPage; cardOnPage++) {
+        const group = cardOnPage % 3;
+        const pools = columnPoolsByGroup[group];
+        let cardHtml;
+        let signature;
+        let attempts = 0;
+        do {
+          const poolSnapshot = pools?.map((pool) => [...pool]);
+          cardHtml = generate75BallCard(page * cardsPerPage + cardOnPage, pools);
+          const template = document.createElement("template");
+          template.innerHTML = cardHtml;
+          signature = getCardSignature(template.content);
+          if (signatures.has(signature) && poolSnapshot) {
+            poolSnapshot.forEach((pool, column) => {
+              pools[column] = pool;
             });
-          }); // This ensures that when the SW takes control (after SKIP_WAITING or closing/opening tab), the page reloads.
-
-          navigator.serviceWorker.addEventListener("controllerchange", () => {
-            console.log(
-              "[App] New ServiceWorker took control - reloading page"
-            ); // Only reload if there is a waiting worker that just activated
-            if (
-              newWorker &&
-              navigator.serviceWorker.controller === registration.active
-            ) {
-              window.location.reload();
-            }
-          });
-        });
-    } // Modified to accept the newWorker object
-
-    function showUpdateNotification(waitingWorker) {
-      if (updateBanner) return;
-
-      updateBanner = document.createElement("div");
-      updateBanner.id = "pwa-update-banner";
-      updateBanner.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
-          <p style="margin: 0; font-size: 1rem;">
-            🎉 <strong>New version available!</strong> Click 'Update' to get the latest features.
-          </p>
-          <div style="display: flex; gap: 10px;">
-            <button id="update-reload-btn" style="
-              padding: 8px 16px;
-              border: none;
-              border-radius: 4px;
-              background: white;
-              color: #4facfe;
-              font-weight: 700;
-              cursor: pointer;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-              font-size: 0.95rem;
-            ">Update Now</button>
-            <button id="update-dismiss-btn" style="
-              padding: 8px 16px;
-              border: 1px solid white;
-              border-radius: 4px;
-              background: transparent;
-              color: white;
-              font-weight: 500;
-              cursor: pointer;
-              font-size: 0.95rem;
-            ">Later</button>
-          </div>
-        </div>
-      `;
-
-      updateBanner.style.cssText = `
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 15px 20px;
-        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        text-align: center;
-        z-index: 10000;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-        animation: slideUp 0.3s ease-out;
-      `;
-
-      document.body.appendChild(updateBanner);
-
-      if (!document.querySelector("#update-banner-styles")) {
-        const style = document.createElement("style");
-        style.id = "update-banner-styles";
-        style.textContent = `
-          @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-          }
-          @keyframes slideDown {
-            from { transform: translateY(0); }
-            to { transform: translateY(100%); }
-          }
-        `;
-        document.head.appendChild(style);
-      }
-
-      document
-        .getElementById("update-reload-btn")
-        .addEventListener("click", () => {
-          console.log("[App] User clicked Update Now"); // CRITICAL FIX: Send message to the waiting worker to take over immediately
-          if (waitingWorker) {
-            waitingWorker.postMessage({ type: "SKIP_WAITING" }); // The 'controllerchange' listener handles the actual reload
-          } else {
-            // Fallback if somehow the worker wasn't tracked
-            window.location.reload();
           }
-        });
-
-      document
-        .getElementById("update-dismiss-btn")
-        .addEventListener("click", () => {
-          console.log("[App] User dismissed update notification");
-          updateBanner.style.animation = "slideDown 0.3s ease-out";
-          setTimeout(() => {
-            if (updateBanner && updateBanner.parentNode) {
-              updateBanner.parentNode.removeChild(updateBanner);
-              updateBanner = null;
-            }
-          }, 300);
-        });
+          attempts++;
+        } while (signatures.has(signature) && attempts < 100);
+        signatures.add(signature);
+        pageHtml += cardHtml;
+      }
+      html += `${pageHtml}</div></div>`;
     }
+    container.innerHTML = html;
+    applyColorVariables();
+  }
 
-    checkForUpdates();
-  })(); // --- Initial Call ---
-
-  initializeControls();
   generateBingoCards();
 });

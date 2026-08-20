@@ -33,14 +33,7 @@
     <div class="controls-container">
       <div class="control-section">
         <label class="control-label">Bingo Type</label>
-        <div class="bingo-type-options">
-          <button class="bingo-type-btn active" data-type="75">
-            75-Ball Bingo (5×5 with Free Space)
-          </button>
-          <button class="bingo-type-btn" data-type="90">
-            90-Ball Bingo (9×3, No Free Space)
-          </button>
-        </div>
+        <p class="bingo-type-description">75-Ball Bingo (5×5 with Free Space)</p>
       </div>
 
       <div class="control-section">
@@ -49,6 +42,7 @@
           <button
             class="color-btn active"
             data-color="default"
+            aria-label="Pink and purple"
             style="
               background: linear-gradient(
                 90deg,
@@ -63,26 +57,31 @@
           <button
             class="color-btn"
             data-color="blue"
+            aria-label="Blue and cyan"
             style="background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)"
           ></button>
           <button
             class="color-btn"
             data-color="purple"
+            aria-label="Lavender and pink"
             style="background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)"
           ></button>
           <button
             class="color-btn"
             data-color="orange"
+            aria-label="Pink and yellow"
             style="background: linear-gradient(90deg, #fa709a 0%, #fee140 100%)"
           ></button>
           <button
             class="color-btn"
             data-color="green"
+            aria-label="Turquoise and green"
             style="background: linear-gradient(90deg, #30cfd0 0%, #330867 100%)"
           ></button>
           <button
             class="color-btn"
             data-color="sunset"
+            aria-label="Sunset colors"
             style="
               background: linear-gradient(
                 90deg,
@@ -95,18 +94,20 @@
           <button
             class="color-btn"
             data-color="ocean"
+            aria-label="Ocean colors"
             style="background: linear-gradient(90deg, #2e3192 0%, #1bffff 100%)"
           ></button>
           <button
             class="color-btn"
             data-color="fire"
+            aria-label="Fire colors"
             style="background: linear-gradient(90deg, #f12711 0%, #f5af19 100%)"
           ></button>
         </div>
       </div>
 
       <div class="control-section" id="freeSpaceSection">
-        <label class="control-label">Free Space Style (75-Ball Only)</label>
+        <label class="control-label">Free Space Style</label>
         <div class="free-space-options" id="free-space-options">
           <button
             class="free-space-btn active"
@@ -166,38 +167,32 @@
       </div>
 
       <div class="control-section">
-        <label class="control-label">Generate Cards</label>
+        <label class="control-label">Generate Pages</label>
         <div class="page-control">
-          <input
-            type="number"
-            id="num-cards"
-            value="9"
-            min="1"
-            max="100"
-            aria-label="Number of cards to generate"
-          />
           <input
             type="number"
             id="num-pages"
             value="1"
             min="1"
-            max="100"
+            max="10"
             aria-label="Number of pages to generate"
-            style="display: none"
           />
-          <span class="info-text" id="cardsPerPageText"
-            >Cards (9 per page)</span
-          >
+          <span class="info-text">9 unique cards per page, maximum 10 pages</span>
         </div>
+      </div>
+
+      <div class="control-section">
+        <label class="control-label" for="page-background">Page Background</label>
+        <select id="page-background" class="page-background-select">
+          <option value="none">No Page Background</option>
+          <option value="themed">Color Theme + Free Space Symbol</option>
+        </select>
       </div>
 
       <div class="control-section" id="allowRepeatsSection">
         <div class="checkbox-container">
-          <input type="checkbox" id="allow-repeats" />
-          <label for="allow-repeats"
-            >Allow Repeats (Faster generation; numbers may appear on multiple
-            cards)</label
-          >
+          <input type="checkbox" id="allow-repeats" checked />
+          <label for="allow-repeats">Allow the same number in a column on multiple cards</label>
         </div>
       </div>
 
@@ -219,6 +214,6 @@
 
     <div id="bingo-cards-container"></div>
 
-    <script src="./script.js?v=29"></script>
+    <script src="./script.js"></script>
   </body>
 </html>

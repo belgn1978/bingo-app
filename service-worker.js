@@ -1,6 +1,6 @@
 /** @format */
 
-const CACHE_NAME = "bingo-card-generator-v30"; // Updated version number
+const CACHE_NAME = "bingo-card-generator-v42";
 const urlsToCache = [
   "./", // The main index file
   "./index.html",
@@ -15,7 +15,7 @@ const urlsToCache = [
 // 1. INSTALLATION (Caching assets)
 // ----------------------------------------------------
 self.addEventListener("install", (event) => {
-  console.log(`[Service Worker V29] Installing and caching shell assets.`);
+  console.log(`[Service Worker V42] Installing and caching shell assets.`);
   // Wait until all files are cached
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -31,7 +31,7 @@ self.addEventListener("install", (event) => {
 // 2. ACTIVATION (Cleaning up old caches)
 // ----------------------------------------------------
 self.addEventListener("activate", (event) => {
-  console.log(`[Service Worker V29] Activating and cleaning old caches.`);
+  console.log(`[Service Worker V42] Activating and cleaning old caches.`);
   // Delete all caches except the current one
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -40,7 +40,7 @@ self.addEventListener("activate", (event) => {
         cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
             console.log(
-              `[Service Worker V29] Deleting old cache: ${cacheName}`
+              `[Service Worker V42] Deleting old cache: ${cacheName}`
             );
             return caches.delete(cacheName);
           }
@@ -59,7 +59,7 @@ self.addEventListener("fetch", (event) => {
   // We only intercept requests that are not cross-origin or special
   if (event.request.url.startsWith(self.location.origin)) {
     event.respondWith(
-      caches.match(event.request).then((response) => {
+      caches.match(event.request, { ignoreSearch: true }).then((response) => {
         // Cache hit - return response
         if (response) {
           return response;
@@ -105,7 +105,7 @@ self.addEventListener("message", (event) => {
   // When the user clicks the "Update Now" button, the main script sends a SKIP_WAITING message.
   if (event.data && event.data.type === "SKIP_WAITING") {
     console.log(
-      "[Service Worker V29] Received SKIP_WAITING message. Activating immediately."
+      "[Service Worker V42] Received SKIP_WAITING message. Activating immediately."
     );
     self.skipWaiting();
   }
