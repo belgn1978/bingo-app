@@ -41,7 +41,7 @@
   <script>
     (() => {
       const colours = { teal:["#14b8a6","#0f4c5c"], red:["#f97316","#991b1b"], blue:["#38bdf8","#1e3a8a"], green:["#84cc16","#166534"], orange:["#fb923c","#9a3412"], purple:["#c084fc","#581c87"], pink:["#f472b6","#9d174d"], yellow:["#facc15","#854d0e"], black:["#64748b","#0f172a"] };
-      const multi = ["#0f766e","#c2410c","#1d4ed8","#3f6212","#9f1239","#6d28d9","#a16207","#0369a1","#be123c"];
+      const multi = [["#2dd4bf","#115e59"],["#fb923c","#9a3412"],["#60a5fa","#1e3a8a"],["#84cc16","#166534"],["#fb7185","#9f1239"],["#c084fc","#581c87"],["#facc15","#854d0e"],["#38bdf8","#075985"],["#fb7185","#be123c"]];
       const images = { star:"⭐", heart:"❤️", balloon:"🎈", clover:"🍀", gift:"🎁", pumpkin:"🎃", ghost:"👻", bat:"🦇", witch:"🧙", tree:"🎄", snowflake:"❄️", snowman:"⛄", santa:"🎅", bunny:"🐰", egg:"🥚", chick:"🐣", flower:"🌷", cake:"🎂", fireworks:"🎆", party:"🎉" };
       const $ = (selector) => document.querySelector(selector);
       const sheets = $("#sheets"), status = $("#status"), pages = $("#pages"), centreType = $("#centre-type"), centreText = $("#centre-text"), centreImage = $("#centre-image"), headerStyle = $("#header-style"), headerColour = $("#header-colour"), differentFinish = $("#different-finish"), repeats = $("#repeats");
@@ -53,7 +53,7 @@
         const palette = colours[headerColour.value]; let head = palette[0], edge = palette[1];
         if (headerStyle.value === "gradient") head = `linear-gradient(110deg, ${palette[0]} 0%, ${palette[0]} 22%, ${palette[1]} 100%)`;
         if (headerStyle.value === "rainbow") { head = "linear-gradient(90deg,#c2410c,#ca8a04,#3f6212,#0369a1,#6d28d9)"; edge = "#6d28d9"; }
-        if (headerStyle.value === "different") { const colour = multi[cardIndex % multi.length]; edge = colour; head = differentFinish.value === "gradient" ? `linear-gradient(110deg, #ffffff 0%, ${colour} 30%, ${colour} 100%)` : colour; }
+        if (headerStyle.value === "different") { const [start, end] = multi[cardIndex % multi.length]; edge = end; head = differentFinish.value === "gradient" ? `linear-gradient(110deg, ${start} 0%, ${end} 100%)` : start; }
         node.style.setProperty("--head", head); node.style.setProperty("--edge", edge); node.innerHTML = "<div class=\"card-head\"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>";
         for (let row = 0; row < 5; row++) for (let column = 0; column < 5; column++) { const cell = document.createElement("div"), centre = row === 2 && column === 2; cell.className = centre ? "cell free" : "cell"; if (centre) { if (centreType.value === "image") { cell.classList.add("image"); cell.textContent = images[centreImage.value]; } else cell.textContent = centreText.value.trim() || "FREE SPACE"; } else cell.textContent = columns[column][column === 2 && row > 2 ? row - 1 : row]; node.append(cell); }
         return node;
