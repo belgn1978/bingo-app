@@ -1,219 +1,68 @@
-<!-- @format -->
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jo's Bingo Tickets</title>
-
-    <meta
-      name="description"
-      content="Generate and print custom bingo tickets with various themes"
-    />
-    <meta name="theme-color" content="#ff69b4" />
-
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="icon-192.png" />
-
-    <link rel="stylesheet" href="styles.css" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <header>
-      <h1>Bingo Card Generator</h1>
-    </header>
-
-    <div class="controls-container">
-      <div class="control-section">
-        <label class="control-label">Bingo Type</label>
-        <p class="bingo-type-description">75-Ball Bingo (5×5 with Free Space)</p>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <title>Bingo Sheet Maker</title>
+  <style>
+    :root { font-family: Georgia, "Times New Roman", serif; color: #172033; background: #e8eee9; }
+    * { box-sizing: border-box; } body { margin: 0; padding: 1rem; }
+    header { max-width: 72rem; margin: 0 auto 1rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+    h1 { margin: 0; font-size: clamp(1.65rem, 5vw, 2.5rem); } .subtitle { margin: 0; color: #52606d; font: .9rem Arial, sans-serif; }
+    .controls { max-width: 72rem; margin: 0 auto 1.5rem; padding: 1rem; background: #fffdf7; border: 1px solid #cbd5d0; border-radius: 8px; box-shadow: 0 8px 24px rgb(23 32 51 / 8%); font-family: Arial, sans-serif; }
+    .control-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    fieldset { min-width: 0; margin: 0; padding: .75rem; border: 1px solid #cbd5d0; border-radius: 5px; } legend { padding: 0 .3rem; font-weight: 700; font-size: .88rem; }
+    label { display: block; font-size: .88rem; line-height: 1.35; } select, input[type="text"], input[type="number"] { width: 100%; min-height: 2.5rem; margin-top: .35rem; padding: .45rem .6rem; border: 1px solid #98a8a0; border-radius: 4px; color: #172033; background: #fff; font: inherit; }
+    .check { display: flex; align-items: center; gap: .55rem; min-height: 2.5rem; cursor: pointer; } input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: #0f766e; } .hint { display: block; margin-top: .4rem; color: #61706a; font-size: .75rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; } button { min-height: 2.6rem; padding: .55rem .9rem; border: 1px solid #0f5e57; border-radius: 4px; background: #0f766e; color: #fff; cursor: pointer; font: 700 .9rem Arial, sans-serif; } button:hover { background: #0b615a; } button.secondary { background: #fffdf7; color: #0f5e57; } button.secondary:hover { background: #e2f0ea; } button:disabled { cursor: wait; opacity: .65; } #status { margin: .75rem 0 0; color: #52606d; font: .83rem Arial, sans-serif; }
+    #sheets { display: grid; gap: 1.5rem; } .sheet { width: min(100%, 210mm); margin: 0 auto; padding: 4rem 2rem; background: #fff; box-shadow: 0 5px 22px rgb(23 32 51 / 16%); } .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; width: 100%; } .card { aspect-ratio: 1; }
+    .card { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: auto repeat(5, 1fr); gap: 1px; min-width: 0; overflow: hidden; border: 1px solid var(--edge); background: #172033; break-inside: avoid; } .card-head { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); min-height: 1.7rem; background: var(--head); color: #fff; } .card-head span { display: grid; place-items: center; font-weight: 700; font-size: clamp(.85rem, 2vw, 1.25rem); }
+    .cell { display: grid; place-items: center; min-width: 0; padding: .1rem; background: #fff; color: #172033; font: 700 clamp(.72rem, 1.8vw, 1.1rem) Arial, sans-serif; text-align: center; } .free { background: #f2f5ea; color: #0f5e57; font-size: clamp(.58rem, 1.35vw, .85rem); line-height: 1.05; } .free.image { font-size: clamp(1rem, 2.8vw, 1.8rem); }
+    @media (max-width: 720px) { body { padding: .65rem; } header { display: block; } .subtitle { margin-top: .3rem; } .control-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sheet { padding: .65rem; box-shadow: none; } .cards { gap: .2rem; } .card-head { min-height: 1.25rem; } }
+    @media (max-width: 440px) { .control-grid { grid-template-columns: 1fr; } .actions button { flex: 1 1 100%; } }
+    @media print { @page { size: A4 portrait; margin: 0; } body { padding: 0; background: #fff; } header, .controls { display: none !important; } #sheets { display: block; } .sheet { width: 210mm; height: 297mm; margin: 0; padding: 4rem 2rem; box-shadow: none; break-after: page; page-break-after: always; } .sheet:last-child { break-after: auto; page-break-after: auto; } .cards { width: 100%; gap: 2mm; } .card { border-width: .35mm; } .card-head { min-height: 8mm; } .card-head span { font-size: 11pt; } .cell { font-size: 10pt; } .free { font-size: 7pt; } .free.image { font-size: 17pt; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
+  </style>
+</head>
+<body>
+  <header><h1>Bingo Sheet Maker</h1><p class="subtitle">Nine 75-ball cards per A4 page</p></header>
+  <main>
+    <section class="controls" aria-label="Bingo card settings">
+      <div class="control-grid">
+        <fieldset><legend>Pages</legend><label for="pages">Number of pages<input id="pages" type="number" min="1" max="500" value="1" inputmode="numeric"></label><span class="hint">1 to 500 pages, 9 cards each</span></fieldset>
+        <fieldset><legend>Centre Square</legend><label for="centre-type">Display<select id="centre-type"><option value="text">Text</option><option value="image">Image</option></select></label><label id="text-wrap" for="centre-text">Centre text<input id="centre-text" type="text" maxlength="18" value="FREE SPACE"></label><label id="image-wrap" for="centre-image" hidden>Centre image<select id="centre-image"><optgroup label="Everyday"><option value="star">Star</option><option value="heart">Heart</option><option value="balloon">Balloon</option><option value="clover">Four-leaf clover</option><option value="gift">Gift</option></optgroup><optgroup label="Halloween"><option value="pumpkin">Pumpkin</option><option value="ghost">Ghost</option><option value="bat">Bat</option><option value="witch">Witch</option></optgroup><optgroup label="Christmas"><option value="tree">Christmas tree</option><option value="snowflake">Snowflake</option><option value="snowman">Snowman</option><option value="santa">Santa</option></optgroup><optgroup label="Easter"><option value="bunny">Bunny</option><option value="egg">Easter egg</option><option value="chick">Chick</option><option value="flower">Flower</option></optgroup><optgroup label="Celebration"><option value="cake">Cake</option><option value="fireworks">Fireworks</option><option value="party">Party popper</option></optgroup></select></label></fieldset>
+        <fieldset><legend>Header Colour</legend><label for="header-style">Style<select id="header-style"><option value="solid">Standard colour</option><option value="gradient">Linear gradient</option><option value="rainbow">Rainbow</option><option value="different">Different card colours</option></select></label><label for="header-colour">Standard colour<select id="header-colour"><option value="teal">Teal</option><option value="red">Red</option><option value="blue">Blue</option><option value="green">Green</option><option value="orange">Orange</option><option value="purple">Purple</option><option value="pink">Pink</option><option value="yellow">Yellow</option><option value="black">Black</option></select></label><label id="different-finish-wrap" for="different-finish" hidden>Different card finish<select id="different-finish"><option value="solid">Standard colour</option><option value="gradient">Linear gradient</option></select></label></fieldset>
+        <fieldset><legend>Number Repeats</legend><label class="check" for="repeats"><input id="repeats" type="checkbox">Allow repeats between cards in a vertical set</label><span class="hint">When off, cards 1/4/7, 2/5/8 and 3/6/9 have no repeated numbers in any B-I-N-G-O column.</span></fieldset>
       </div>
-
-      <div class="control-section">
-        <label class="control-label">Card Theme (Color)</label>
-        <div class="color-options" id="color-select">
-          <button
-            class="color-btn active"
-            data-color="default"
-            aria-label="Pink and purple"
-            style="
-              background: linear-gradient(
-                90deg,
-                #ff69b4 0%,
-                #da70d6 25%,
-                #ba55d3 50%,
-                #9932cc 75%,
-                #8b008b 100%
-              );
-            "
-          ></button>
-          <button
-            class="color-btn"
-            data-color="blue"
-            aria-label="Blue and cyan"
-            style="background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)"
-          ></button>
-          <button
-            class="color-btn"
-            data-color="purple"
-            aria-label="Lavender and pink"
-            style="background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%)"
-          ></button>
-          <button
-            class="color-btn"
-            data-color="orange"
-            aria-label="Pink and yellow"
-            style="background: linear-gradient(90deg, #fa709a 0%, #fee140 100%)"
-          ></button>
-          <button
-            class="color-btn"
-            data-color="green"
-            aria-label="Turquoise and green"
-            style="background: linear-gradient(90deg, #30cfd0 0%, #330867 100%)"
-          ></button>
-          <button
-            class="color-btn"
-            data-color="sunset"
-            aria-label="Sunset colors"
-            style="
-              background: linear-gradient(
-                90deg,
-                #ff6b6b 0%,
-                #feca57 50%,
-                #ee5a6f 100%
-              );
-            "
-          ></button>
-          <button
-            class="color-btn"
-            data-color="ocean"
-            aria-label="Ocean colors"
-            style="background: linear-gradient(90deg, #2e3192 0%, #1bffff 100%)"
-          ></button>
-          <button
-            class="color-btn"
-            data-color="fire"
-            aria-label="Fire colors"
-            style="background: linear-gradient(90deg, #f12711 0%, #f5af19 100%)"
-          ></button>
-        </div>
-      </div>
-
-      <div class="control-section" id="freeSpaceSection">
-        <label class="control-label">Free Space Style</label>
-        <div class="free-space-options" id="free-space-options">
-          <button
-            class="free-space-btn active"
-            data-style="text"
-            id="free-space-text-style"
-          >
-            "Free Space" Text
-          </button>
-          <button class="free-space-btn" data-style="star">⭐ Star</button>
-          <button class="free-space-btn" data-style="heart">❤️ Heart</button>
-          <button class="free-space-btn" data-style="tree">🎄 Tree</button>
-          <button class="free-space-btn" data-style="snowflake">
-            ❄️ Snowflake
-          </button>
-          <button class="free-space-btn" data-style="pumpkin">
-            🎃 Pumpkin
-          </button>
-          <button class="free-space-btn" data-style="ghost">👻 Ghost</button>
-          <button class="free-space-btn" data-style="turkey">🦃 Turkey</button>
-          <button class="free-space-btn" data-style="gift">🎁 Gift</button>
-          <button class="free-space-btn" data-style="firework">
-            🎆 Firework
-          </button>
-          <button class="free-space-btn" data-style="balloon">
-            🎈 Balloon
-          </button>
-          <button class="free-space-btn" data-style="cake">🎂 Cake</button>
-          <button class="free-space-btn" data-style="clover">🍀 Clover</button>
-          <button class="free-space-btn" data-style="egg">🥚 Egg</button>
-          <button class="free-space-btn" data-style="bunny">🐰 Bunny</button>
-          <button class="free-space-btn" data-style="flag">🎌 Flag</button>
-          <button class="free-space-btn" data-style="menorah">
-            🕎 Menorah
-          </button>
-          <button class="free-space-btn" data-style="dreidel">
-            🔯 Dreidel
-          </button>
-          <button class="free-space-btn" data-style="owl">🦉 Owl</button>
-          <button
-            class="free-space-btn"
-            data-style="custom"
-            id="free-space-shape-style"
-          >
-            ✏️ Custom Text
-          </button>
-        </div>
-        <div id="customTextContainer" style="display: none; margin-top: 1rem">
-          <input
-            type="text"
-            id="custom-text-input"
-            class="custom-text-input"
-            placeholder="Enter custom text..."
-            value="Free Space"
-            maxlength="15"
-          />
-        </div>
-      </div>
-
-      <div class="control-section">
-        <label class="control-label">Generate Pages</label>
-        <div class="page-control">
-          <input
-            type="number"
-            id="num-pages"
-            value="1"
-            min="1"
-            max="10"
-            aria-label="Number of pages to generate"
-          />
-          <span class="info-text">9 unique cards per page, maximum 10 pages</span>
-        </div>
-      </div>
-
-      <div class="control-section">
-        <label class="control-label" for="page-background">Page Background</label>
-        <select id="page-background" class="page-background-select">
-          <option value="none">No Page Background</option>
-          <option value="themed">Color Theme + Free Space Symbol</option>
-        </select>
-      </div>
-
-      <div class="control-section" id="allowRepeatsSection">
-        <div class="checkbox-container">
-          <input type="checkbox" id="allow-repeats" checked />
-          <label for="allow-repeats">Allow the same number in a column on multiple cards</label>
-        </div>
-      </div>
-
-      <div class="control-section" style="text-align: center">
-        <button
-          class="btn btn-primary"
-          id="generate-btn"
-          style="margin-right: 1rem"
-        >
-          Generate New Cards
-        </button>
-        <button class="btn btn-success" id="print-btn">🖨️ Print Cards</button>
-      </div>
-
-      <p class="info-text">
-        **Note:** For mobile, use **"Add to Home Screen"** for best performance.
-      </p>
-    </div>
-
-    <div id="bingo-cards-container"></div>
-
-    <script src="./script.js"></script>
-  </body>
+      <div class="actions"><button id="generate" type="button">Generate cards</button><button id="print" type="button" class="secondary">Print / Save as PDF</button></div><p id="status" role="status">Ready.</p>
+    </section>
+    <section id="sheets" aria-label="Generated bingo sheets"></section>
+  </main>
+  <script>
+    (() => {
+      const colours = { teal:["#14b8a6","#0f4c5c"], red:["#f97316","#991b1b"], blue:["#38bdf8","#1e3a8a"], green:["#84cc16","#166534"], orange:["#fb923c","#9a3412"], purple:["#c084fc","#581c87"], pink:["#f472b6","#9d174d"], yellow:["#facc15","#854d0e"], black:["#64748b","#0f172a"] };
+      const multi = ["#0f766e","#c2410c","#1d4ed8","#3f6212","#9f1239","#6d28d9","#a16207","#0369a1","#be123c"];
+      const images = { star:"⭐", heart:"❤️", balloon:"🎈", clover:"🍀", gift:"🎁", pumpkin:"🎃", ghost:"👻", bat:"🦇", witch:"🧙", tree:"🎄", snowflake:"❄️", snowman:"⛄", santa:"🎅", bunny:"🐰", egg:"🥚", chick:"🐣", flower:"🌷", cake:"🎂", fireworks:"🎆", party:"🎉" };
+      const $ = (selector) => document.querySelector(selector);
+      const sheets = $("#sheets"), status = $("#status"), pages = $("#pages"), centreType = $("#centre-type"), centreText = $("#centre-text"), centreImage = $("#centre-image"), headerStyle = $("#header-style"), headerColour = $("#header-colour"), differentFinish = $("#different-finish"), repeats = $("#repeats");
+      const shuffle = (values) => { for (let index = values.length - 1; index > 0; index--) { const other = Math.floor(Math.random() * (index + 1)); [values[index], values[other]] = [values[other], values[index]]; } return values; };
+      function numbersFor(column, used) { const choices = shuffle(Array.from({length:15}, (_, index) => column * 15 + index + 1).filter((number) => !used || !used.has(number))); return choices.slice(0, column === 2 ? 4 : 5).sort((a, b) => a - b); }
+      function card(cardIndex, usedColumns) {
+        const columns = Array.from({length:5}, (_, column) => { const used = usedColumns && usedColumns[column], values = numbersFor(column, used); if (used) values.forEach((number) => used.add(number)); return values; });
+        const node = document.createElement("article"); node.className = "card";
+        const palette = colours[headerColour.value]; let head = palette[0], edge = palette[1];
+        if (headerStyle.value === "gradient") head = `linear-gradient(110deg, ${palette[0]} 0%, ${palette[0]} 22%, ${palette[1]} 100%)`;
+        if (headerStyle.value === "rainbow") { head = "linear-gradient(90deg,#c2410c,#ca8a04,#3f6212,#0369a1,#6d28d9)"; edge = "#6d28d9"; }
+        if (headerStyle.value === "different") { const colour = multi[cardIndex % multi.length]; edge = colour; head = differentFinish.value === "gradient" ? `linear-gradient(110deg, #ffffff 0%, ${colour} 30%, ${colour} 100%)` : colour; }
+        node.style.setProperty("--head", head); node.style.setProperty("--edge", edge); node.innerHTML = "<div class=\"card-head\"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>";
+        for (let row = 0; row < 5; row++) for (let column = 0; column < 5; column++) { const cell = document.createElement("div"), centre = row === 2 && column === 2; cell.className = centre ? "cell free" : "cell"; if (centre) { if (centreType.value === "image") { cell.classList.add("image"); cell.textContent = images[centreImage.value]; } else cell.textContent = centreText.value.trim() || "FREE SPACE"; } else cell.textContent = columns[column][column === 2 && row > 2 ? row - 1 : row]; node.append(cell); }
+        return node;
+      }
+      function generate() { const count = Math.max(1, Math.min(500, Number.parseInt(pages.value, 10) || 1)); pages.value = count; const fragment = document.createDocumentFragment(); for (let page = 0; page < count; page++) { const sheet = document.createElement("section"), cards = document.createElement("div"); sheet.className = "sheet"; cards.className = "cards"; const used = Array.from({length:3}, () => repeats.checked ? null : Array.from({length:5}, () => new Set())); for (let cardIndex = 0; cardIndex < 9; cardIndex++) cards.append(card(cardIndex, used[cardIndex % 3])); sheet.append(cards); fragment.append(sheet); } sheets.replaceChildren(fragment); status.textContent = `${count} page${count === 1 ? "" : "s"} generated (${count * 9} cards).`; }
+      function centreControls() { const image = centreType.value === "image"; $("#text-wrap").hidden = image; $("#image-wrap").hidden = !image; }
+      function headerControls() { $("#different-finish-wrap").hidden = headerStyle.value !== "different"; }
+      centreType.addEventListener("change", () => { centreControls(); generate(); }); headerStyle.addEventListener("change", () => { headerControls(); generate(); }); [centreText, centreImage, differentFinish, headerColour, repeats, pages].forEach((control) => control.addEventListener("change", generate)); $("#generate").addEventListener("click", generate); $("#print").addEventListener("click", () => window.print()); centreControls(); headerControls(); generate();
+    })();
+  </script>
+</body>
 </html>
