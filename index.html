@@ -30,12 +30,12 @@
     .card[class*="theme-"]:not(.theme-classic) .card-head,
     .card[class*="theme-"]:not(.theme-classic) .cell { position:relative; z-index:2; }
     .theme-decor svg { position:absolute; inset:0; width:100%; height:100%; overflow:hidden; }
-    .theme-autumn { --theme-edge:#c99a78; --theme-bg:radial-gradient(circle at 25% 20%,#fff7e8 0 18%,transparent 19%),linear-gradient(145deg,#f7dfbd,#fff6e5 46%,#efd0aa); --theme-cell:#fffaf0; --theme-free:#f4e3c8; --theme-free-text:#74432e; }
+    .theme-autumn { --theme-edge:#d1b293; --theme-bg:#fff8e9 url("./assets/autumn-frame.svg") center/100% 100% no-repeat; --theme-cell:#fffdf7; --theme-free:#f5e5ce; --theme-free-text:#70422d; }
     .theme-autumn .card-head { background:transparent !important; gap:3px; padding:1px 2px 4px; }
     .theme-autumn .card-head span { border-radius:7px 7px 4px 4px; color:#fffdf8; text-shadow:0 1px 1px rgb(82 51 44 / 35%); box-shadow:inset 0 0 0 1px rgb(100 65 60 / 18%); font-family:Georgia,serif; }
     .theme-autumn .card-head span:nth-child(1){background:#b77ac8}.theme-autumn .card-head span:nth-child(2){background:#e58daf}.theme-autumn .card-head span:nth-child(3){background:#e7a45d}.theme-autumn .card-head span:nth-child(4){background:#76a98c}.theme-autumn .card-head span:nth-child(5){background:#dd7180}
     .theme-autumn .cell { border-color:#d9c8b6; color:#27272a; }
-    .theme-autumn::before { content:""; position:absolute; inset:3px; z-index:1; pointer-events:none; border:1px solid rgba(135,91,61,.22); border-radius:6px; }
+    .theme-autumn::before { content:""; position:absolute; inset:2px; z-index:1; pointer-events:none; border:1px solid rgba(135,91,61,.16); border-radius:6px; }
     .theme-autumn .woodland-badge { display:none !important;  position:absolute; z-index:5; width:25%; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 42% 35%,#fff8e9 0 28%,#e7bd8c 30% 58%,#a9633c 60% 100%); border:2px solid #fff0d2; box-shadow:0 1px 4px rgb(88 48 31 / 28%); color:#563522; font:700 8px Georgia,serif; text-align:center; line-height:1; }
     .theme-autumn .woodland-badge.tl { left:1.5%; top:1.5%; } .theme-autumn .woodland-badge.br { right:1.5%; bottom:1.5%; }
     .theme-autumn .woodland-badge svg { width:86%; height:86%; }
@@ -55,7 +55,7 @@
     .theme-celebration { --theme-edge:#7550a8; --theme-bg:linear-gradient(145deg,#ffe7a1,#fff7ef 45%,#efc4dc); --theme-cell:#fffdf8; --theme-free:#ffe8a8; --theme-free-text:#68448f; }
     .card { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: auto repeat(5, 1fr); gap: 1px; min-width: 0; overflow: hidden; border: 1px solid var(--edge); background: var(--edge); break-inside: avoid; } .card-head { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); min-height: 2.75rem; padding: .35rem 0; background: var(--head); color: #fff; } .card-head span { display: grid; place-items: center; font-weight: 700; font-size: clamp(.9rem, 2vw, 1.35rem); }
     .cell { display: grid; place-items: center; min-width: 0; padding: .1rem; background: #fff; color: #172033; font: 700 clamp(.72rem, 1.8vw, 1.1rem) Arial, sans-serif; text-align: center; } .free { background: #f2f5ea; color: #0f5e57; font-size: clamp(.58rem, 1.35vw, .85rem); line-height: 1.05; } .free.image { font-size: clamp(1rem, 2.8vw, 1.8rem); }
-    @media (max-width: 720px) { .card[class*="theme-"]:not(.theme-classic) { --frame:11px; } body { padding: .65rem; } header { display: block; } .subtitle { margin-top: .3rem; } .control-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sheet { padding: .65rem; box-shadow: none; } .cards { gap: .2rem; } .card-head { min-height: 1.25rem; } }
+    @media (max-width: 720px) { .card[class*="theme-"]:not(.theme-classic) { --frame:11px; } .theme-autumn { --frame:9px !important; } body { padding: .65rem; } header { display: block; } .subtitle { margin-top: .3rem; } .control-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sheet { padding: .65rem; box-shadow: none; } .cards { gap: .2rem; } .card-head { min-height: 1.25rem; } }
     @media (max-width: 440px) { .control-grid { grid-template-columns: 1fr; } .actions button { flex: 1 1 100%; } }
     @media print {
       @page { size:A4 portrait; margin:0; }
@@ -66,7 +66,7 @@
       .sheet:last-child { break-after:auto; page-break-after:auto; }
       .cards { height:281mm; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:2.5mm; }
       .card { width:auto; height:auto; aspect-ratio:auto; min-height:0; }
-      .card[class*="theme-"]:not(.theme-classic) { --frame:5.5mm; border-radius:2mm; }
+      .card[class*="theme-"]:not(.theme-classic) { --frame:5.5mm; border-radius:2mm; } .theme-autumn { --frame:3.4mm !important; }
       .card-head { min-height:10mm; }
       .card-head span { font-size:13pt; }
       .cell { font-size:10pt; padding:0; }
@@ -78,7 +78,7 @@
   </style>
 </head>
 <body>
-  <header><h1>Bingo Sheet Maker <span class="build-badge" id="build-badge">Build 0.9.0</span></h1><p class="subtitle">Nine 75-ball cards per A4 page</p></header>
+  <header><h1>Bingo Sheet Maker <span class="build-badge" id="build-badge">Build 0.9.1</span></h1><p class="subtitle">Nine 75-ball cards per A4 page</p></header>
   <main>
     <section class="controls" aria-label="Bingo card settings">
       <div class="control-grid">
@@ -94,7 +94,7 @@
   </main>
   <script>
     (() => {
-      const BUILD = "0.9.0";
+      const BUILD = "0.9.1";
       const colours = { teal:["#14b8a6","#0f4c5c"], red:["#f97316","#991b1b"], blue:["#38bdf8","#1e3a8a"], green:["#84cc16","#166534"], orange:["#fb923c","#9a3412"], purple:["#c084fc","#581c87"], pink:["#f472b6","#9d174d"], yellow:["#facc15","#854d0e"], black:["#64748b","#0f172a"] };
       const multi = [["#2dd4bf","#115e59"],["#fb923c","#9a3412"],["#60a5fa","#1e3a8a"],["#84cc16","#166534"],["#fb7185","#9f1239"],["#c084fc","#581c87"],["#facc15","#854d0e"],["#38bdf8","#075985"],["#fb7185","#be123c"]];
       const images = { star:"⭐", heart:"❤️", balloon:"🎈", clover:"🍀", gift:"🎁", spring:"🌸", summer:"☀️", autumn:"🍂", winter:"❄️", pumpkin:"🎃", ghost:"👻", bat:"🦇", witch:"🧙", tree:"🎄", snowflake:"❄️", snowman:"⛄", santa:"🎅", bunny:"🐰", egg:"🥚", chick:"🐣", flower:"🌷", cake:"🎂", fireworks:"🎆", party:"🎉" };
@@ -117,7 +117,7 @@
 `<svg viewBox="0 0 100 100"><path d="M22 72q-6-37 25-48 26-8 40 14-19-6-29 7 22-5 30 15-2 24-28 26-25 2-38-14z" fill="#c86434"/><path d="M47 44l-5-18 14 12 13-13-2 20" fill="#d87943"/><path d="M54 48q17-12 29 3-9 22-31 19z" fill="#f3d2ad"/><circle cx="70" cy="50" r="3" fill="#211f1c"/><path d="M82 59l8 3-8 4" fill="#211f1c"/></svg>`,
 `<svg viewBox="0 0 100 100"><ellipse cx="52" cy="56" rx="30" ry="35" fill="#8d6448"/><circle cx="40" cy="51" r="14" fill="#e7c89e"/><circle cx="65" cy="51" r="14" fill="#e7c89e"/><circle cx="40" cy="51" r="5" fill="#27221e"/><circle cx="65" cy="51" r="5" fill="#27221e"/><path d="M49 62l7 0-4 7z" fill="#d59b3d"/><path d="M28 30L17 15l22 8M73 29l13-14-3 23" fill="#8d6448"/></svg>`];
       const leafStrip=`<div class="botanical-strip top"><i style="--r:-35deg;--c:#c85d37"></i><i style="--r:18deg;--c:#d79a37"></i><i style="--r:-15deg;--c:#b54f60"></i><i style="--r:30deg;--c:#71865d"></i><i style="--r:-28deg;--c:#d97838"></i></div><div class="botanical-strip bottom"><i style="--r:-35deg;--c:#c85d37"></i><i style="--r:18deg;--c:#d79a37"></i><i style="--r:-15deg;--c:#b54f60"></i><i style="--r:30deg;--c:#71865d"></i><i style="--r:-28deg;--c:#d97838"></i></div>`;
-      function decorFor(name,index){ const d=decorSvg[name]; return Array.isArray(d) ? d[index % d.length] : d; }
+      function decorFor(name,index){ if(name==="autumn") return ""; const d=decorSvg[name]; return Array.isArray(d) ? d[index % d.length] : d; }
       function premiumAutumn(index){ const a=woodlandBadges[index%woodlandBadges.length], b=woodlandBadges[(index+1)%woodlandBadges.length]; return leafStrip+`<div class="woodland-badge tl">${a}</div><div class="woodland-badge br">${b}</div>`; }
       const themeDefaults = {
         classic:null,
