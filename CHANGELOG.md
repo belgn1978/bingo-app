@@ -1,5 +1,18 @@
 # Bingo Maker Change Log
 
+## 0.9.1 — 28 September 2026
+### Changed
+- Replaced Autumn's legacy CSS/inline-SVG imitation with a dedicated reusable illustrated frame asset at `assets/autumn-frame.svg`.
+- Reduced the Autumn frame thickness on both mobile preview and A4 print.
+- Kept the live BINGO header, number grid and FREE SPACE separate from the artwork layer.
+- Disabled the old Autumn decoration SVGs so the app now renders the actual frame asset rather than a rough reconstruction.
+
+### Testing required
+- Visual match/quality of the installed Autumn theme.
+- A4/PDF frame thickness and artwork rendering.
+- Confirm number grid remains unobstructed.
+
+
 ## 0.9.0 — 28 September 2026
 ### Added
 - Visible build number in the installed app.
