@@ -1,5 +1,5 @@
-const CACHE="bingo-maker-build-0.9.0";
-const CORE=["./","./index.html","./manifest.webmanifest","./icon.svg"];
+const CACHE="bingo-maker-build-0.9.1";
+const CORE=["./","./index.html","./manifest.webmanifest","./icon.svg","./assets/autumn-frame.svg"];
 self.addEventListener("install",event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)))});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",event=>{
