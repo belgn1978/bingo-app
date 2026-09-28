@@ -26,18 +26,20 @@
     .card[class*="theme-"]:not(.theme-classic) .cell { background:var(--theme-cell); }
     .card[class*="theme-"]:not(.theme-classic) .free { background:var(--theme-free); color:var(--theme-free-text); }
     .theme-decor { display:none; }
-    .card[class*="theme-"]:not(.theme-classic) .theme-decor { display:block; position:absolute; inset:0; z-index:4; pointer-events:none; }
-    .theme-decor svg { width:100%; height:100%; overflow:visible; }
+    .card[class*="theme-"]:not(.theme-classic) .theme-decor { display:block; position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; border-radius:inherit; }
+    .card[class*="theme-"]:not(.theme-classic) .card-head,
+    .card[class*="theme-"]:not(.theme-classic) .cell { position:relative; z-index:2; }
+    .theme-decor svg { position:absolute; inset:0; width:100%; height:100%; overflow:hidden; }
     .theme-autumn { --theme-edge:#c99a78; --theme-bg:radial-gradient(circle at 25% 20%,#fff7e8 0 18%,transparent 19%),linear-gradient(145deg,#f7dfbd,#fff6e5 46%,#efd0aa); --theme-cell:#fffaf0; --theme-free:#f4e3c8; --theme-free-text:#74432e; }
-    .theme-autumn .card-head { background:transparent !important; gap:2px; padding:0 1px 3px; }
-    .theme-autumn .card-head span { border-radius:5px 5px 3px 3px; color:#fffdf8; text-shadow:0 1px 1px rgb(82 51 44 / 35%); box-shadow:inset 0 0 0 1px rgb(100 65 60 / 18%); font-family:Georgia,serif; }
+    .theme-autumn .card-head { background:transparent !important; gap:3px; padding:1px 2px 4px; }
+    .theme-autumn .card-head span { border-radius:7px 7px 4px 4px; color:#fffdf8; text-shadow:0 1px 1px rgb(82 51 44 / 35%); box-shadow:inset 0 0 0 1px rgb(100 65 60 / 18%); font-family:Georgia,serif; }
     .theme-autumn .card-head span:nth-child(1){background:#b77ac8}.theme-autumn .card-head span:nth-child(2){background:#e58daf}.theme-autumn .card-head span:nth-child(3){background:#e7a45d}.theme-autumn .card-head span:nth-child(4){background:#76a98c}.theme-autumn .card-head span:nth-child(5){background:#dd7180}
     .theme-autumn .cell { border-color:#d9c8b6; color:#27272a; }
-    .theme-autumn::before { content:""; position:absolute; inset:3px; z-index:3; pointer-events:none; border:5px solid transparent; border-image:linear-gradient(90deg,#bd5b38,#d89b39,#70855e,#b54f5e,#d97938) 1; opacity:.38; }
-    .theme-autumn .woodland-badge { position:absolute; z-index:5; width:25%; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 42% 35%,#fff8e9 0 28%,#e7bd8c 30% 58%,#a9633c 60% 100%); border:2px solid #fff0d2; box-shadow:0 1px 4px rgb(88 48 31 / 28%); color:#563522; font:700 8px Georgia,serif; text-align:center; line-height:1; }
+    .theme-autumn::before { content:""; position:absolute; inset:3px; z-index:1; pointer-events:none; border:1px solid rgba(135,91,61,.22); border-radius:6px; }
+    .theme-autumn .woodland-badge { display:none !important;  position:absolute; z-index:5; width:25%; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 42% 35%,#fff8e9 0 28%,#e7bd8c 30% 58%,#a9633c 60% 100%); border:2px solid #fff0d2; box-shadow:0 1px 4px rgb(88 48 31 / 28%); color:#563522; font:700 8px Georgia,serif; text-align:center; line-height:1; }
     .theme-autumn .woodland-badge.tl { left:1.5%; top:1.5%; } .theme-autumn .woodland-badge.br { right:1.5%; bottom:1.5%; }
     .theme-autumn .woodland-badge svg { width:86%; height:86%; }
-    .theme-autumn .botanical-strip { position:absolute; z-index:4; pointer-events:none; left:9%; right:9%; height:10%; display:flex; align-items:center; justify-content:space-around; }
+    .theme-autumn .botanical-strip { display:none !important;  position:absolute; z-index:4; pointer-events:none; left:9%; right:9%; height:10%; display:flex; align-items:center; justify-content:space-around; }
     .theme-autumn .botanical-strip.top { top:1%; } .theme-autumn .botanical-strip.bottom { bottom:1%; transform:rotate(180deg); }
     .theme-autumn .botanical-strip i { width:9%; height:70%; display:block; border-radius:80% 0 80% 0; transform:rotate(var(--r)); background:var(--c); box-shadow:7px 2px 0 -2px #7f925f,14px -1px 0 -3px #b44f5e; }
     .theme-autumn .free { position:relative; border:2px solid #c78355; border-radius:4px; background:radial-gradient(circle at 50% 35%,#fff8e7,#efd2a9); font-family:Georgia,serif; font-weight:800; font-size:clamp(.45rem,1vw,.7rem); color:#70422d; text-transform:uppercase; letter-spacing:.03em; }
@@ -136,7 +138,7 @@
         if (!themed && headerStyle.value === "gradient") head = `linear-gradient(110deg, ${palette[0]} 0%, ${palette[0]} 22%, ${palette[1]} 100%)`;
         if (!themed && headerStyle.value === "rainbow") { head = "linear-gradient(90deg,#c2410c,#ca8a04,#3f6212,#0369a1,#6d28d9)"; edge = "#6d28d9"; }
         if (!themed && headerStyle.value === "different") { const [start, end] = multi[cardIndex % multi.length]; edge = end; head = differentFinish.value === "gradient" ? `linear-gradient(110deg, ${start} 0%, ${end} 100%)` : start; }
-        node.style.setProperty("--head", head); node.style.setProperty("--edge", edge); node.innerHTML = (decorFor(theme.value,cardIndex) ? `<div class="theme-decor">${decorFor(theme.value,cardIndex)}</div>` : "") + (theme.value==="autumn" ? premiumAutumn(cardIndex) : "") + "<div class=\"card-head\"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>";
+        node.style.setProperty("--head", head); node.style.setProperty("--edge", edge); node.innerHTML = (decorFor(theme.value,cardIndex) ? `<div class="theme-decor">${decorFor(theme.value,cardIndex)}</div>` : "") + "<div class=\"card-head\"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>";
         for (let row = 0; row < 5; row++) for (let column = 0; column < 5; column++) { const cell = document.createElement("div"), centre = row === 2 && column === 2; cell.className = centre ? "cell free" : "cell"; if (centre) { if (theme.value === "autumn" && centreText.value.trim() === "FREE SPACE") { cell.classList.add("image"); cell.setAttribute("aria-label","FREE SPACE"); } else if (centreType.value === "image") { cell.classList.add("image"); cell.textContent = images[centreImage.value]; } else if (themed && centreText.value.trim() === "FREE SPACE") { cell.classList.add("image"); cell.textContent = themed.centre; } else cell.textContent = centreText.value.trim() || "FREE SPACE"; } else cell.textContent = columns[column][column === 2 && row > 2 ? row - 1 : row]; node.append(cell); }
         return node;
       }
