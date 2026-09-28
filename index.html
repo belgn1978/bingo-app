@@ -33,6 +33,13 @@
     .theme-autumn .card-head span { border-radius:5px 5px 3px 3px; color:#fffdf8; text-shadow:0 1px 1px rgb(82 51 44 / 35%); box-shadow:inset 0 0 0 1px rgb(100 65 60 / 18%); font-family:Georgia,serif; }
     .theme-autumn .card-head span:nth-child(1){background:#b77ac8}.theme-autumn .card-head span:nth-child(2){background:#e58daf}.theme-autumn .card-head span:nth-child(3){background:#e7a45d}.theme-autumn .card-head span:nth-child(4){background:#76a98c}.theme-autumn .card-head span:nth-child(5){background:#dd7180}
     .theme-autumn .cell { border-color:#d9c8b6; color:#27272a; }
+    .theme-autumn::before { content:""; position:absolute; inset:3px; z-index:3; pointer-events:none; border:5px solid transparent; border-image:linear-gradient(90deg,#bd5b38,#d89b39,#70855e,#b54f5e,#d97938) 1; opacity:.38; }
+    .theme-autumn .woodland-badge { position:absolute; z-index:5; width:25%; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 42% 35%,#fff8e9 0 28%,#e7bd8c 30% 58%,#a9633c 60% 100%); border:2px solid #fff0d2; box-shadow:0 1px 4px rgb(88 48 31 / 28%); color:#563522; font:700 8px Georgia,serif; text-align:center; line-height:1; }
+    .theme-autumn .woodland-badge.tl { left:1.5%; top:1.5%; } .theme-autumn .woodland-badge.br { right:1.5%; bottom:1.5%; }
+    .theme-autumn .woodland-badge svg { width:86%; height:86%; }
+    .theme-autumn .botanical-strip { position:absolute; z-index:4; pointer-events:none; left:9%; right:9%; height:10%; display:flex; align-items:center; justify-content:space-around; }
+    .theme-autumn .botanical-strip.top { top:1%; } .theme-autumn .botanical-strip.bottom { bottom:1%; transform:rotate(180deg); }
+    .theme-autumn .botanical-strip i { width:9%; height:70%; display:block; border-radius:80% 0 80% 0; transform:rotate(var(--r)); background:var(--c); box-shadow:7px 2px 0 -2px #7f925f,14px -1px 0 -3px #b44f5e; }
     .theme-autumn .free { position:relative; border:2px solid #c78355; border-radius:4px; background:radial-gradient(circle at 50% 35%,#fff8e7,#efd2a9); font-family:Georgia,serif; font-weight:800; font-size:clamp(.45rem,1vw,.7rem); color:#70422d; text-transform:uppercase; letter-spacing:.03em; }
     .theme-autumn .free::before { content:"FREE"; display:block; font-size:1.05em; line-height:1; }
     .theme-autumn .free::after { content:"SPACE"; display:block; font-size:.78em; line-height:1.05; }
@@ -48,7 +55,24 @@
     .cell { display: grid; place-items: center; min-width: 0; padding: .1rem; background: #fff; color: #172033; font: 700 clamp(.72rem, 1.8vw, 1.1rem) Arial, sans-serif; text-align: center; } .free { background: #f2f5ea; color: #0f5e57; font-size: clamp(.58rem, 1.35vw, .85rem); line-height: 1.05; } .free.image { font-size: clamp(1rem, 2.8vw, 1.8rem); }
     @media (max-width: 720px) { .card[class*="theme-"]:not(.theme-classic) { --frame:11px; } body { padding: .65rem; } header { display: block; } .subtitle { margin-top: .3rem; } .control-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sheet { padding: .65rem; box-shadow: none; } .cards { gap: .2rem; } .card-head { min-height: 1.25rem; } }
     @media (max-width: 440px) { .control-grid { grid-template-columns: 1fr; } .actions button { flex: 1 1 100%; } }
-    @media print { .card[class*="theme-"]:not(.theme-classic) { --frame:5mm; } @page { size: A4 portrait; margin: 0; } body { padding: 0; background: #fff; } header, .controls { display: none !important; } #sheets { display: block; } .sheet { width: 210mm; height: 297mm; margin: 0; padding: 4rem 2rem; box-shadow: none; break-after: page; page-break-after: always; } .sheet:last-child { break-after: auto; page-break-after: auto; } .cards { width: 100%; gap: 2mm; } .card { aspect-ratio: .74; border-width: .35mm; } .card-head { min-height: 12mm; } .card-head span { font-size: 12pt; } .cell { font-size: 10pt; } .free { font-size: 7pt; } .free.image { font-size: 17pt; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
+    @media print {
+      @page { size:A4 portrait; margin:0; }
+      html,body { width:210mm; margin:0; padding:0; background:#fff; }
+      header,.controls { display:none !important; }
+      #sheets { display:block; }
+      .sheet { width:210mm; height:297mm; margin:0; padding:8mm; box-shadow:none; break-after:page; page-break-after:always; overflow:hidden; }
+      .sheet:last-child { break-after:auto; page-break-after:auto; }
+      .cards { height:281mm; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:2.5mm; }
+      .card { width:auto; height:auto; aspect-ratio:auto; min-height:0; }
+      .card[class*="theme-"]:not(.theme-classic) { --frame:5.5mm; border-radius:2mm; }
+      .card-head { min-height:10mm; }
+      .card-head span { font-size:13pt; }
+      .cell { font-size:10pt; padding:0; }
+      .free { font-size:6.5pt; }
+      .theme-autumn .free.image::before { font-size:6.5pt; }
+      .theme-autumn .free.image::after { font-size:5pt; }
+      * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+    }
   </style>
 </head>
 <body>
@@ -84,7 +108,14 @@
         spring:`<svg viewBox="0 0 240 265"><g fill="#e99fbd"><circle cx="25" cy="22" r="5"/><circle cx="18" cy="29" r="5"/><circle cx="32" cy="29" r="5"/><circle cx="25" cy="36" r="5"/></g><circle cx="25" cy="29" r="4" fill="#e7c84f"/><g fill="#86b975"><path d="M48 5q14 10 0 20-14-10 0-20zM193 240q14 10 0 20-14-10 0-20z"/></g><path d="M210 18q9-10 18 0-9 10-18 0z" fill="#7fb9d6"/></svg>`,
         celebration:`<svg viewBox="0 0 240 265"><g fill="#e56f9f"><ellipse cx="22" cy="24" rx="9" ry="12"/><ellipse cx="215" cy="238" rx="9" ry="12"/></g><g stroke="#7550a8" stroke-width="2"><path d="M22 36l5 16M215 250l-6 12"/></g><g fill="#e5bb42"><path d="M48 8l3 8 8 3-8 3-3 8-3-8-8-3 8-3zM192 236l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/></g></svg>`
       };
+      const woodlandBadges=[
+`<svg viewBox="0 0 100 100"><path d="M24 67q-18-24 5-42 16-12 29 3-17 0-21 14 18-13 31-2 14 13 2 31-12 17-35 8z" fill="#b96136"/><path d="M53 49q16-15 28 1l-6 25H48z" fill="#d9824d"/><path d="M58 45l-3-14 11 9 11-9-2 15" fill="#d9824d"/><circle cx="70" cy="51" r="3" fill="#28231f"/><path d="M79 59l9 3-9 3" fill="#28231f"/></svg>`,
+`<svg viewBox="0 0 100 100"><path d="M18 69q4-35 37-38 30 4 29 37-10-13-18-5-8-15-16 0-9-15-16 0-8-12-16 6z" fill="#77533e"/><path d="M39 63q13-18 35-2 14 11 2 24H37q-8-12 2-22z" fill="#d8ad82"/><circle cx="70" cy="67" r="3" fill="#26211d"/><circle cx="82" cy="75" r="3" fill="#26211d"/></svg>`,
+`<svg viewBox="0 0 100 100"><path d="M22 72q-6-37 25-48 26-8 40 14-19-6-29 7 22-5 30 15-2 24-28 26-25 2-38-14z" fill="#c86434"/><path d="M47 44l-5-18 14 12 13-13-2 20" fill="#d87943"/><path d="M54 48q17-12 29 3-9 22-31 19z" fill="#f3d2ad"/><circle cx="70" cy="50" r="3" fill="#211f1c"/><path d="M82 59l8 3-8 4" fill="#211f1c"/></svg>`,
+`<svg viewBox="0 0 100 100"><ellipse cx="52" cy="56" rx="30" ry="35" fill="#8d6448"/><circle cx="40" cy="51" r="14" fill="#e7c89e"/><circle cx="65" cy="51" r="14" fill="#e7c89e"/><circle cx="40" cy="51" r="5" fill="#27221e"/><circle cx="65" cy="51" r="5" fill="#27221e"/><path d="M49 62l7 0-4 7z" fill="#d59b3d"/><path d="M28 30L17 15l22 8M73 29l13-14-3 23" fill="#8d6448"/></svg>`];
+      const leafStrip=`<div class="botanical-strip top"><i style="--r:-35deg;--c:#c85d37"></i><i style="--r:18deg;--c:#d79a37"></i><i style="--r:-15deg;--c:#b54f60"></i><i style="--r:30deg;--c:#71865d"></i><i style="--r:-28deg;--c:#d97838"></i></div><div class="botanical-strip bottom"><i style="--r:-35deg;--c:#c85d37"></i><i style="--r:18deg;--c:#d79a37"></i><i style="--r:-15deg;--c:#b54f60"></i><i style="--r:30deg;--c:#71865d"></i><i style="--r:-28deg;--c:#d97838"></i></div>`;
       function decorFor(name,index){ const d=decorSvg[name]; return Array.isArray(d) ? d[index % d.length] : d; }
+      function premiumAutumn(index){ const a=woodlandBadges[index%woodlandBadges.length], b=woodlandBadges[(index+1)%woodlandBadges.length]; return leafStrip+`<div class="woodland-badge tl">${a}</div><div class="woodland-badge br">${b}</div>`; }
       const themeDefaults = {
         classic:null,
         autumn:{head:"#b85f3b",edge:"#8f4a2f",centre:"🍂"},
@@ -105,7 +136,7 @@
         if (!themed && headerStyle.value === "gradient") head = `linear-gradient(110deg, ${palette[0]} 0%, ${palette[0]} 22%, ${palette[1]} 100%)`;
         if (!themed && headerStyle.value === "rainbow") { head = "linear-gradient(90deg,#c2410c,#ca8a04,#3f6212,#0369a1,#6d28d9)"; edge = "#6d28d9"; }
         if (!themed && headerStyle.value === "different") { const [start, end] = multi[cardIndex % multi.length]; edge = end; head = differentFinish.value === "gradient" ? `linear-gradient(110deg, ${start} 0%, ${end} 100%)` : start; }
-        node.style.setProperty("--head", head); node.style.setProperty("--edge", edge); node.innerHTML = (decorFor(theme.value,cardIndex) ? `<div class="theme-decor">${decorFor(theme.value,cardIndex)}</div>` : "") + "<div class=\"card-head\"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>";
+        node.style.setProperty("--head", head); node.style.setProperty("--edge", edge); node.innerHTML = (decorFor(theme.value,cardIndex) ? `<div class="theme-decor">${decorFor(theme.value,cardIndex)}</div>` : "") + (theme.value==="autumn" ? premiumAutumn(cardIndex) : "") + "<div class=\"card-head\"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>";
         for (let row = 0; row < 5; row++) for (let column = 0; column < 5; column++) { const cell = document.createElement("div"), centre = row === 2 && column === 2; cell.className = centre ? "cell free" : "cell"; if (centre) { if (theme.value === "autumn" && centreText.value.trim() === "FREE SPACE") { cell.classList.add("image"); cell.setAttribute("aria-label","FREE SPACE"); } else if (centreType.value === "image") { cell.classList.add("image"); cell.textContent = images[centreImage.value]; } else if (themed && centreText.value.trim() === "FREE SPACE") { cell.classList.add("image"); cell.textContent = themed.centre; } else cell.textContent = centreText.value.trim() || "FREE SPACE"; } else cell.textContent = columns[column][column === 2 && row > 2 ? row - 1 : row]; node.append(cell); }
         return node;
       }
